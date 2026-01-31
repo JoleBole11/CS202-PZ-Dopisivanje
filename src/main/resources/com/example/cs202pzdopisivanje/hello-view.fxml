@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.TextFlow?>
+
+<?import javafx.geometry.Insets?>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity"
+            minHeight="-Infinity" minWidth="-Infinity"
+            prefHeight="400.0" prefWidth="600.0"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.cs202pzdopisivanje.HelloController">
+    <left>
+        <ScrollPane hbarPolicy="NEVER" prefHeight="400.0" prefWidth="122.0" vbarPolicy="ALWAYS" BorderPane.alignment="CENTER">
+            <content>
+                <VBox prefHeight="400.0" prefWidth="109.0" />
+            </content>
+        </ScrollPane>
+    </left>
+    <center>
+        <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <center>
+                <ScrollPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                    <content>
+                        <VBox alignment="BOTTOM_LEFT" prefHeight="312.0" prefWidth="462.0">
+                            <children>
+                                <HBox fx:id="messageBox" prefHeight="100.0" prefWidth="200.0">
+                                    <children>
+                                        <TextFlow prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                    </children>
+                                </HBox>
+                            </children></VBox>
+                    </content></ScrollPane>
+            </center>
+            <bottom>
+                <HBox fx:id="messageSendBox" alignment="CENTER_LEFT" BorderPane.alignment="TOP_LEFT">
+                    <children>
+                        <TextArea prefHeight="58.0" prefWidth="394.0" promptText="Type here..." HBox.hgrow="ALWAYS" />
+                        <Button fx:id="SendBtn" alignment="CENTER_RIGHT" contentDisplay="CENTER" mnemonicParsing="false" text="Send" textAlignment="CENTER" HBox.hgrow="ALWAYS">
+                            <HBox.margin>
+                                <Insets left="20.0" right="20.0" />
+                            </HBox.margin>
+                        </Button>
+                    </children>
+                </HBox>
+            </bottom>
+        </BorderPane>
+    </center>
+    <top>
+        <HBox prefHeight="29.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+            <children>
+                <MenuBar>
+                    <menus>
+                        <Menu mnemonicParsing="false" text="Profile">
+                            <items>
+                                <MenuItem mnemonicParsing="false" text="Edit" />
+                                <MenuItem mnemonicParsing="false" text="Log Out" />
+                            </items>
+                        </Menu>
+                    </menus>
+                </MenuBar>
+            </children></HBox>
+    </top>
+</BorderPane>
