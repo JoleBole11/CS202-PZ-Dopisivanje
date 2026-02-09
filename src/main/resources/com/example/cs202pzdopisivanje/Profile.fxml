@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.cs202pzdopisivanje.Windows.ProfileController">
+   <children>
+      <VBox alignment="CENTER" layoutX="160.0" layoutY="36.0" prefHeight="328.0" prefWidth="281.0">
+         <children>
+            <Label text="Username" />
+            <TextField text="Username">
+               <VBox.margin>
+                  <Insets bottom="20.0" />
+               </VBox.margin>
+            </TextField>
+            <Label text="Password" />
+            <PasswordField text="Password">
+               <VBox.margin>
+                  <Insets bottom="20.0" />
+               </VBox.margin>
+            </PasswordField>
+            <HBox alignment="CENTER" prefHeight="52.0" prefWidth="281.0">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#OnCancelButtonClick" text="Cancel">
+                     <HBox.margin>
+                        <Insets right="50.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button mnemonicParsing="false" onAction="#OnSaveButtonClick" text="Save" />
+               </children>
+            </HBox>
+         </children></VBox>
+   </children>
+</AnchorPane>

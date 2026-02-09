@@ -1,55 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.TextFlow?>
 
-<?import javafx.geometry.Insets?>
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity"
-            minHeight="-Infinity" minWidth="-Infinity"
-            prefHeight="400.0" prefWidth="600.0"
-            xmlns="http://javafx.com/javafx/17.0.12"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="Windows.HomeController">
-    <left>
-        <ScrollPane hbarPolicy="NEVER" prefHeight="400.0" prefWidth="122.0" vbarPolicy="ALWAYS" BorderPane.alignment="CENTER">
-            <content>
-                <VBox prefHeight="400.0" prefWidth="109.0" />
-            </content>
-        </ScrollPane>
-    </left>
-    <center>
-        <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-            <center>
-                <ScrollPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                    <content>
-                        <VBox alignment="BOTTOM_LEFT" prefHeight="312.0" prefWidth="462.0">
-                            <children>
-                                <HBox fx:id="messageBox" prefHeight="100.0" prefWidth="200.0">
-                                    <children>
-                                        <TextFlow prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-                                    </children>
-                                </HBox>
-                            </children></VBox>
-                    </content></ScrollPane>
-            </center>
-            <bottom>
-                <HBox fx:id="messageSendBox" alignment="CENTER_LEFT" BorderPane.alignment="TOP_LEFT">
-                    <children>
-                        <TextArea prefHeight="58.0" prefWidth="394.0" promptText="Type here..." HBox.hgrow="ALWAYS" />
-                        <Button fx:id="SendBtn" alignment="CENTER_RIGHT" contentDisplay="CENTER" mnemonicParsing="false" text="Send" textAlignment="CENTER" HBox.hgrow="ALWAYS">
-                            <HBox.margin>
-                                <Insets left="20.0" right="20.0" />
-                            </HBox.margin>
-                        </Button>
-                    </children>
-                </HBox>
-            </bottom>
-        </BorderPane>
-    </center>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="500" minWidth="800" prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.cs202pzdopisivanje.Windows.HomeController">
     <top>
         <HBox prefHeight="29.0" prefWidth="600.0" BorderPane.alignment="CENTER">
             <children>
@@ -57,12 +12,62 @@
                     <menus>
                         <Menu mnemonicParsing="false" text="Profile">
                             <items>
-                                <MenuItem mnemonicParsing="false" text="Edit" />
-                                <MenuItem mnemonicParsing="false" text="Log Out" />
+                                <MenuItem mnemonicParsing="false" onAction="#OnEditMenuClick" text="Edit" />
+                                <MenuItem mnemonicParsing="false" onAction="#OnLogOutMenuClick" text="Log Out" />
                             </items>
                         </Menu>
                     </menus>
                 </MenuBar>
             </children></HBox>
     </top>
+   <center>
+      <SplitPane dividerPositions="0.5" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <items>
+            <BorderPane maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0">
+               <top>
+                  <MenuBar BorderPane.alignment="CENTER">
+                    <menus>
+                      <Menu mnemonicParsing="false" text="Chats">
+                           <items>
+                              <RadioMenuItem mnemonicParsing="false" selected="true" text="Friends">
+                                 <toggleGroup>
+                                    <ToggleGroup fx:id="Chats" />
+                                 </toggleGroup>
+                              </RadioMenuItem>
+                              <RadioMenuItem mnemonicParsing="false" text="Groups" toggleGroup="$Chats" />
+                           </items>
+                      </Menu>
+                    </menus>
+                  </MenuBar>
+               </top>
+               <center>
+                  <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <ListView prefHeight="200.0" prefWidth="200.0" />
+                        <ListView disable="true" prefHeight="200.0" prefWidth="200.0" />
+                     </children></VBox>
+               </center>
+            </BorderPane>
+            <BorderPane prefHeight="200.0" prefWidth="200.0">
+               <bottom>
+                  <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <TextArea promptText="Type here..." HBox.hgrow="ALWAYS">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin></TextArea>
+                        <Button alignment="CENTER" contentDisplay="CENTER" maxHeight="40.0" maxWidth="60.0" mnemonicParsing="false" text="Send" HBox.hgrow="ALWAYS">
+                           <HBox.margin>
+                              <Insets left="20.0" right="20.0" />
+                           </HBox.margin>
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                        </Button>
+                     </children></HBox>
+               </bottom>
+            </BorderPane>
+        </items>
+      </SplitPane>
+   </center>
 </BorderPane>
