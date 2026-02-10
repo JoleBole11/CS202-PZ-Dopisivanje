@@ -1,4 +1,4 @@
-package com.example.cs202pzdopisivanje.Windows;
+package com.example.cs202pzdopisivanje;
 
 import Enums.SceneEnum;
 import javafx.application.Application;
@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class HomeApplication extends Application {
 
-    private static Stage primaryStage;
+    public static Stage primaryStage;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -36,7 +36,7 @@ public class HomeApplication extends Application {
                     title = "Login";
                 }
                 case HOME -> {
-                    fxmlFile = "home.fxml";
+                    fxmlFile = "Home.fxml";
                     title = "Home";
                 }
                 case PROFILE -> {
@@ -46,6 +46,10 @@ public class HomeApplication extends Application {
                 case REGISTER -> {
                     fxmlFile = "Register.fxml";
                     title = "Register";
+                }
+                case FRIENDS -> {
+                    fxmlFile = "Friends.fxml";
+                    title = "Friends";
                 }
             }
 

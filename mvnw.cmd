@@ -155,7 +155,7 @@ if exist %WRAPPER_JAR% (
 @REM End of extension
 
 @REM Provide a "standardized" way to retrieve the CLI args that will
-@REM work with both com.example.cs202pzdopisivanje.Windows and non-com.example.cs202pzdopisivanje.Windows executions.
+@REM work with both com.example.cs202pzdopisivanje.Controllers and non-com.example.cs202pzdopisivanje.Controllers executions.
 set MAVEN_CMD_LINE_ARGS=%*
 
 %MAVEN_JAVA_EXE% ^
