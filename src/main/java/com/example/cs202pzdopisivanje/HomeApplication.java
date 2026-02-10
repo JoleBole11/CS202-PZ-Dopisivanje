@@ -1,6 +1,7 @@
 package com.example.cs202pzdopisivanje;
 
 import Enums.SceneEnum;
+import com.example.cs202pzdopisivanje.Network.*;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -12,11 +13,25 @@ public class HomeApplication extends Application {
 
     public static Stage primaryStage;
 
+    /** Starts the application and connects to the server. */
     @Override
     public void start(Stage stage) throws IOException {
-        primaryStage = stage;
-        switchScene(SceneEnum.LOGIN);
-        stage.show();
+        try {
+            Client.connect();
+            primaryStage = stage;
+            primaryStage.setTitle("Dopisivanje");
+            switchScene(SceneEnum.LOGIN);
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /** Stops the application, disconnects and stops the server. */
+    @Override
+    public void stop() throws Exception {
+        Client.disconnect();
+        super.stop();
     }
 
     /** Switches scenes for the current stage.
@@ -24,39 +39,31 @@ public class HomeApplication extends Application {
      * @param sceneEnum
      * Scene that will be switched to.
      */
-
     public static void switchScene(SceneEnum sceneEnum) {
         try {
             String fxmlFile = "";
-            String title = "";
 
             switch (sceneEnum) {
                 case LOGIN -> {
                     fxmlFile = "LogIn.fxml";
-                    title = "Login";
                 }
                 case HOME -> {
                     fxmlFile = "Home.fxml";
-                    title = "Home";
                 }
                 case PROFILE -> {
                     fxmlFile = "Profile.fxml";
-                    title = "User Profile";
                 }
                 case REGISTER -> {
                     fxmlFile = "Register.fxml";
-                    title = "Register";
                 }
                 case FRIENDS -> {
                     fxmlFile = "Friends.fxml";
-                    title = "Friends";
                 }
             }
 
             FXMLLoader fxmlLoader = new FXMLLoader(HomeApplication.class.getResource("/com/example/cs202pzdopisivanje/" + fxmlFile));
             Scene scene = new Scene(fxmlLoader.load());
-            
-            primaryStage.setTitle(title);
+
             primaryStage.setScene(scene);
 
         } catch (IOException e) {

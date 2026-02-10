@@ -9,12 +9,12 @@
       <VBox alignment="CENTER" layoutX="168.0" layoutY="15.0" prefHeight="370.0" prefWidth="264.0">
          <children>
             <Label text="Username" />
-            <TextField promptText="Your username...">
+            <TextField fx:id="usernameField" promptText="Your username...">
                <VBox.margin>
                   <Insets bottom="20.0" />
                </VBox.margin></TextField>
             <Label text="Password" />
-            <PasswordField promptText="Your password...">
+            <PasswordField fx:id="passwordField" promptText="Your password...">
                <VBox.margin>
                   <Insets bottom="20.0" />
                </VBox.margin>
@@ -24,6 +24,11 @@
                   <Insets bottom="20.0" />
                </VBox.margin></Button>
             <Button mnemonicParsing="false" onAction="#OnRegisterButtonClick" text="Register" />
+            <Label fx:id="errorLabel" text="Error" textFill="RED" visible="false">
+               <VBox.margin>
+                  <Insets top="30.0" />
+               </VBox.margin>
+            </Label>
          </children>
          <opaqueInsets>
             <Insets />

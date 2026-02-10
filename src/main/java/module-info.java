@@ -2,6 +2,10 @@ module com.example.cs202pzdopisivanje {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.graphics;
+    requires java.sql;
+    requires jdk.httpserver;
+    requires ons;
+    requires java.desktop;
 
 
     exports com.example.cs202pzdopisivanje;

@@ -11,10 +11,10 @@ import javafx.scene.control.ListView;
 public class HomeController {
 
     @FXML
-    private ListView<String> friendsList; // Renamed to match fx:id in Home.fxml
+    private ListView<String> friendsList;
 
     @FXML
-    private ListView<String> groupsList;  // Renamed to match fx:id in Home.fxml
+    private ListView<String> groupsList;
 
     private final ObservableList<String> items = FXCollections.observableArrayList (
             "Strahinja", "Viktor", "Andrija", "Matija");
@@ -24,10 +24,9 @@ public class HomeController {
 
     @FXML
     public void initialize() {
-        // This method is called automatically by FXMLLoader after the FXML is loaded
         if (friendsList != null) {
             friendsList.setItems(items);
-            friendsList.toFront(); // Ensure friends are visible by default
+            friendsList.toFront();
         }
     }
 
