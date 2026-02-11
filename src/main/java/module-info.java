@@ -6,6 +6,7 @@ module com.example.cs202pzdopisivanje {
     requires jdk.httpserver;
     requires ons;
     requires java.desktop;
+    requires mysql.connector.j;
 
 
     exports com.example.cs202pzdopisivanje;

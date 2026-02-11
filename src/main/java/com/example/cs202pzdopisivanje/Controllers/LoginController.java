@@ -4,7 +4,9 @@ import Enums.SceneEnum;
 import com.example.cs202pzdopisivanje.Database.DbManager;
 import com.example.cs202pzdopisivanje.HomeApplication;
 import com.example.cs202pzdopisivanje.Network.Client;
+import com.example.cs202pzdopisivanje.Objects.User;
 import com.example.cs202pzdopisivanje.Requests.LoginRequest;
+import com.example.cs202pzdopisivanje.Requests.UsernameRequest;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -35,17 +37,25 @@ public class LoginController {
             return;
         }
 
+        Client.getHandler().send(new UsernameRequest(username));
+        UsernameRequest response = (UsernameRequest) Client.getHandler().tryReceive();
+
+        if (response.getUsername() == null) {
+            showError("Invalid username. Please try again.");
+            return;
+        }
+
         Client.getHandler().send(new LoginRequest(username, password));
-        LoginRequest response = (LoginRequest) Client.getHandler().tryReceive();
+        LoginRequest response2 = (LoginRequest) Client.getHandler().tryReceive();
 
-        if (response.getId() == -1) {
-            showError("Invalid username or password.");
-        }
-        else {
-            HomeApplication.switchScene(SceneEnum.HOME);
+        if (response2.getId() == -1) {
+            showError("Invalid password. Please try again.");
+            return;
         }
 
-        DbManager.setAccountID(response.getId());
+        HomeApplication.currentUser.setPassword(password);
+        HomeApplication.currentUser.setUsername(username);
+        HomeApplication.switchScene(SceneEnum.HOME);
     }
 
     /** Sets the text to display the error when logging in. */

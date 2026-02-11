@@ -2,6 +2,7 @@ package com.example.cs202pzdopisivanje.Network;
 
 import com.example.cs202pzdopisivanje.Requests.Request;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -64,13 +65,17 @@ public class Handler implements AutoCloseable {
     /**
      * Attempts to receive a Request object from the connected entity.
      *
-     * @return The received Request object, or null if an error occurs.
+     * @return The received Request object, or null if the peer disconnected (EOF) or an error occurs.
      */
     public Request tryReceive() {
         try {
             return receive();
+        } catch (EOFException eof) {
+            // Peer closed the connection cleanly (or crashed). Treat as "disconnected".
+            return null;
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            // Keep as unchecked for now, but preserve the cause.
+            throw new RuntimeException("Failed to receive object from server.", e);
         }
     }
 

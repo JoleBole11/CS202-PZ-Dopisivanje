@@ -2,7 +2,7 @@ package com.example.cs202pzdopisivanje.Network;
 
 import Enums.Constants;
 import com.example.cs202pzdopisivanje.Database.DbManager;
-import com.example.cs202pzdopisivanje.Requests.LoginRequest;
+import com.example.cs202pzdopisivanje.Requests.*;
 
 
 import java.io.IOException;
@@ -64,9 +64,26 @@ public class Server {
                 System.out.println(Constants.serverHandlingData);
                 if (received == null) break;
 
-                if (received instanceof LoginRequest request) {
+                if (received instanceof UsernameRequest request) {
+                    request.setUsername(DbManager.userService().checkIfUserExists(request.getUsername()));
+                    handler.send(request);
+                }
+                else if (received instanceof LoginRequest request) {
                     request.setId(DbManager.userService().login(request.getUsername(), request.getPassword()));
                     handler.send(request);
+                }
+                else if (received instanceof RegisterRequest request) {
+                    request.setId(DbManager.userService().register(request.getUsername(), request.getPassword()));
+                    handler.send(request);
+                }
+                else if (received instanceof EditRequest request) {
+                    DbManager.userService().editUser(DbManager.getAccountID(), request.getUsername(), request.getPassword());
+                    handler.send(request);
+                }
+                else if (received instanceof GroupRequest request) {
+                    request.setGroups(DbManager.ChatService().getUserGroups());
+                    handler.send(request);
+
                 }
             }
         }

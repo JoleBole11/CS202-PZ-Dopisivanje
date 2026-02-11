@@ -9,20 +9,20 @@
       <VBox alignment="CENTER" layoutX="160.0" layoutY="36.0" prefHeight="328.0" prefWidth="281.0">
          <children>
             <Label text="Username" />
-            <TextField text="Username">
+            <TextField fx:id="usernameField" text="Username">
                <VBox.margin>
                   <Insets bottom="20.0" />
                </VBox.margin>
             </TextField>
             <Label text="Password" />
-            <PasswordField text="Password">
+            <PasswordField fx:id="passwordField" text="Password">
                <VBox.margin>
                   <Insets bottom="20.0" />
                </VBox.margin>
             </PasswordField>
             <HBox alignment="CENTER" prefHeight="52.0" prefWidth="281.0">
                <children>
-                  <Button mnemonicParsing="false" onAction="#OnCancelButtonClick" text="Cancel">
+                  <Button mnemonicParsing="false" onAction="#OnExitButtonClick" text="Exit">
                      <HBox.margin>
                         <Insets right="50.0" />
                      </HBox.margin>
@@ -30,6 +30,11 @@
                   <Button mnemonicParsing="false" onAction="#OnSaveButtonClick" text="Save" />
                </children>
             </HBox>
+            <Label fx:id="errorLabel" text="Label" textFill="RED" visible="false">
+               <VBox.margin>
+                  <Insets top="30.0" />
+               </VBox.margin>
+            </Label>
          </children></VBox>
    </children>
 </AnchorPane>

@@ -2,6 +2,7 @@ package com.example.cs202pzdopisivanje;
 
 import Enums.SceneEnum;
 import com.example.cs202pzdopisivanje.Network.*;
+import com.example.cs202pzdopisivanje.Objects.User;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -12,6 +13,7 @@ import java.io.IOException;
 public class HomeApplication extends Application {
 
     public static Stage primaryStage;
+    public static User currentUser;
 
     /** Starts the application and connects to the server. */
     @Override
@@ -22,6 +24,7 @@ public class HomeApplication extends Application {
             primaryStage.setTitle("Dopisivanje");
             switchScene(SceneEnum.LOGIN);
             stage.show();
+            currentUser = new User("", "");
         } catch (Exception e) {
             e.printStackTrace();
         }
