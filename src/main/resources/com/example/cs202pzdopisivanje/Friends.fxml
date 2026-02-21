@@ -21,18 +21,68 @@
                      <font>
                         <Font size="14.0" />
                      </font></Button>
+                  <Button layoutX="30.0" layoutY="30.0" mnemonicParsing="false" onAction="#OnFriendsButtonClick" text="Friends">
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets left="40.0" top="20.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button layoutX="69.0" layoutY="10.0" mnemonicParsing="false" onAction="#OnRequestsButtonClick" text="Requests">
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets left="20.0" top="20.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button layoutX="185.0" layoutY="30.0" mnemonicParsing="false" onAction="#OnSentButtonClick" text="Sent">
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets left="20.0" top="20.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button layoutX="271.0" layoutY="30.0" mnemonicParsing="false" onAction="#OnAddFriendButtonClick" text="Add Friend">
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets left="40.0" top="20.0" />
+                     </HBox.margin>
+                  </Button>
                </children>
             </HBox>
          </top>
          <center>
-            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+            <StackPane prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                <children>
-                  <ListView prefHeight="300.0" prefWidth="200.0">
-                     <VBox.margin>
-                        <Insets left="10.0" right="10.0" />
-                     </VBox.margin>
+                  <ListView fx:id="friendsList" editable="true" prefHeight="200.0" prefWidth="200.0">
+                     <StackPane.margin>
+                        <Insets />
+                     </StackPane.margin>
                   </ListView>
-               </children></VBox>
+                  <ListView fx:id="requestsList" editable="true" prefHeight="200.0" prefWidth="200.0" />
+                  <ListView fx:id="sentList" editable="true" layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="200.0" />
+               </children>
+               <BorderPane.margin>
+                  <Insets bottom="20.0" left="10.0" right="10.0" top="20.0" />
+               </BorderPane.margin>
+            </StackPane>
          </center></BorderPane>
    </children>
 </AnchorPane>

@@ -21,19 +21,17 @@ public class HomeController {
     @FXML
     private ListView<String> groupsList;
 
-    private final ObservableList<String> items = FXCollections.observableArrayList (
-            "Strahinja", "Viktor", "Andrija", "Matija");
+    private final ObservableList<String> friends = FXCollections.observableArrayList ();
 
     private final ObservableList<String> groups = FXCollections.observableArrayList ();
 
     @FXML
     public void initialize() throws IOException {
         if (friendsList != null) {
-            friendsList.setItems(items);
+            friendsList.setItems(friends);
             friendsList.toFront();
         }
 
-        // Load user's groups
         try {
             Client.getHandler().send(new GroupRequest(DbManager.getAccountID()));
             GroupRequest response = (GroupRequest) Client.getHandler().tryReceive();
@@ -73,7 +71,7 @@ public class HomeController {
             groupsList.toBack();
             groupsList.setDisable(true);
             friendsList.setDisable(false);
-            friendsList.setItems(items);
+            friendsList.setItems(friends);
         }
     }
 

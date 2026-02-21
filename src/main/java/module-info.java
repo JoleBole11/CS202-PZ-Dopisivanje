@@ -7,6 +7,7 @@ module com.example.cs202pzdopisivanje {
     requires ons;
     requires java.desktop;
     requires mysql.connector.j;
+    requires javafx.base;
 
 
     exports com.example.cs202pzdopisivanje;

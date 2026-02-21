@@ -2,6 +2,7 @@ package com.example.cs202pzdopisivanje.Database;
 
 import Enums.Constants;
 import com.example.cs202pzdopisivanje.Services.ChatService;
+import com.example.cs202pzdopisivanje.Services.FriendService;
 import com.example.cs202pzdopisivanje.Services.UserService;
 
 import java.sql.*;
@@ -106,5 +107,18 @@ public class DbManager {
         }
 
         return chatService;
+    }
+
+    private static FriendService friendService = null;
+    public static FriendService FriendService() throws Exception {
+        if (!connected) {
+            throw new Exception(Constants.notConnected);
+        }
+
+        if (friendService == null) {
+            friendService = new FriendService(connection);
+        }
+
+        return friendService;
     }
 }

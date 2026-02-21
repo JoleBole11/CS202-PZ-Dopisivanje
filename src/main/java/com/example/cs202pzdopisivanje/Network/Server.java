@@ -85,6 +85,14 @@ public class Server {
                     handler.send(request);
 
                 }
+                else if (received instanceof FriendRequest request) {
+                    request.setFriends(DbManager.FriendService().getUserFriends());
+                    handler.send(request);
+                }
+                else if (received instanceof FriendReqRequest request) {
+                    request.setFriends(DbManager.FriendService().getUserRequests());
+                    handler.send(request);
+                }
             }
         }
         stop();
