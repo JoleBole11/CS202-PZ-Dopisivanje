@@ -4,11 +4,13 @@ import Enums.SceneEnum;
 import com.example.cs202pzdopisivanje.Database.DbManager;
 import com.example.cs202pzdopisivanje.HomeApplication;
 import com.example.cs202pzdopisivanje.Network.Client;
+import com.example.cs202pzdopisivanje.Requests.FriendRequest;
 import com.example.cs202pzdopisivanje.Requests.GroupRequest;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 
 import java.io.IOException;
@@ -20,6 +22,9 @@ public class HomeController {
 
     @FXML
     private ListView<String> groupsList;
+
+    @FXML
+    private Button createGroupButton;
 
     private final ObservableList<String> friends = FXCollections.observableArrayList ();
 
@@ -35,6 +40,8 @@ public class HomeController {
         try {
             Client.getHandler().send(new GroupRequest(DbManager.getAccountID()));
             GroupRequest response = (GroupRequest) Client.getHandler().tryReceive();
+            Client.getHandler().send(new FriendRequest(DbManager.getAccountID()));
+            FriendRequest response2 = (FriendRequest) Client.getHandler().tryReceive();
             
             if (response != null && response.getGroups() != null) {
                 groups.clear();
@@ -43,8 +50,16 @@ public class HomeController {
             } else {
                 System.out.println("No groups received or response was null"); // Debug output
             }
+
+            if (response2 != null && response2.getFriends() != null) {
+                friends.clear();
+                friends.addAll(response2.getFriends());
+                System.out.println("Loaded " + friends.size() + " friends"); // Debug output
+            } else {
+                System.out.println("No friends received or response was null"); // Debug output
+            }
         } catch (Exception e) {
-            System.out.println("Error loading groups: " + e.getMessage());
+            System.out.println("Error loading groups or friends: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -72,6 +87,8 @@ public class HomeController {
             groupsList.setDisable(true);
             friendsList.setDisable(false);
             friendsList.setItems(friends);
+            createGroupButton.setVisible(false);
+            createGroupButton.setDisable(true);
         }
     }
 
@@ -83,6 +100,11 @@ public class HomeController {
             groupsList.setDisable(false);
             friendsList.setDisable(true);
             groupsList.setItems(groups);
+            createGroupButton.setVisible(true);
+            createGroupButton.setDisable(false);
         }
+    }
+
+    public void OnCreateGroupClick(ActionEvent actionEvent) {
     }
 }

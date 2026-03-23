@@ -1,6 +1,10 @@
 package com.example.cs202pzdopisivanje.CellFactories;
 
+import com.example.cs202pzdopisivanje.Network.Client;
 import com.example.cs202pzdopisivanje.Objects.FriendRequestObject;
+import com.example.cs202pzdopisivanje.Requests.AcceptFriendRequest;
+import com.example.cs202pzdopisivanje.Requests.DenyFriendRequest;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -9,6 +13,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 
+import java.io.IOException;
 import java.util.Objects;
 
 public class FriendRequestCell extends ListCell<FriendRequestObject> {
@@ -20,18 +25,12 @@ public class FriendRequestCell extends ListCell<FriendRequestObject> {
     private final Button denyButton = new Button("Deny");
     private final Label pendingLabel = new Label("Pending");
 
-    private Runnable onAccept;
-    private Runnable onDeny;
-
     public FriendRequestCell() {
         HBox.setHgrow(spacer, Priority.ALWAYS);
         hBox.setAlignment(Pos.CENTER_LEFT);
         acceptButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
         denyButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
         pendingLabel.setStyle("-fx-text-fill: gray; -fx-font-style: italic;");
-
-        acceptButton.setOnAction(e -> { if (onAccept != null) onAccept.run(); });
-        denyButton.setOnAction(e -> { if (onDeny != null) onDeny.run(); });
     }
 
     @Override
@@ -46,16 +45,47 @@ public class FriendRequestCell extends ListCell<FriendRequestObject> {
         hBox.getChildren().clear();
 
         if (Objects.equals(item.getType(), "Pending")) {
-            // Incoming request — show Accept/Deny
-            onAccept = () -> getListView().getItems().remove(item);
-            onDeny = () -> getListView().getItems().remove(item);
+            acceptButton.setOnAction(e -> acceptFriendRequest(item));
+            denyButton.setOnAction(e -> denyFriendRequest(item));
             hBox.getChildren().addAll(nameLabel, spacer, acceptButton, denyButton);
         } else if (Objects.equals(item.getType(), "Sent")) {
-            // Sent request — show Pending label
             hBox.getChildren().addAll(nameLabel, spacer, pendingLabel);
         }
 
         setGraphic(hBox);
     }
+    
+    private void acceptFriendRequest(FriendRequestObject item) {
+        try {
+            Client.getHandler().send(new AcceptFriendRequest(item.getName()));
+            AcceptFriendRequest response = (AcceptFriendRequest) Client.getHandler().tryReceive();
+            
+            if (Objects.equals(response.getUsername(), "Success")) {
+                Platform.runLater(() -> getListView().getItems().remove(item));
+                System.out.println("Friend request accepted successfully");
+            } else {
+                System.err.println("Failed to accept friend request: " + response.getUsername());
+            }
+        } catch (IOException e) {
+            System.err.println("Error accepting friend request: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    private void denyFriendRequest(FriendRequestObject item) {
+        try {
+            Client.getHandler().send(new DenyFriendRequest(item.getName()));
+            DenyFriendRequest response = (DenyFriendRequest) Client.getHandler().tryReceive();
+            
+            if (Objects.equals(response.getUsername(), "Success")) {
+                Platform.runLater(() -> getListView().getItems().remove(item));
+                System.out.println("Friend request denied successfully");
+            } else {
+                System.err.println("Failed to deny friend request: " + response.getUsername());
+            }
+        } catch (IOException e) {
+            System.err.println("Error denying friend request: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }
-

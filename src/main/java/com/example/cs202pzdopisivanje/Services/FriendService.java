@@ -2,13 +2,11 @@ package com.example.cs202pzdopisivanje.Services;
 
 import com.example.cs202pzdopisivanje.Database.DbManager;
 import com.example.cs202pzdopisivanje.Database.Queries.FriendQuery;
+import com.example.cs202pzdopisivanje.Database.Queries.UserQuery;
 import com.example.cs202pzdopisivanje.Objects.FriendRequestObject;
 
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,4 +78,130 @@ public class FriendService {
 
         return friendRequests;
     }
+
+    public String sendFriendRequest(String username){
+        if (friendRequestExists(username)) {
+            return "Exists";
+        }
+        
+        final String query = FriendQuery.sendFriendRequest();
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, DbManager.getAccountID());
+            statement.setString(2, username);
+            statement.setString(3, username);
+            statement.setInt(4, DbManager.getAccountID());
+            
+            int affected = statement.executeUpdate();
+
+            if (affected == 2) {
+                return "Success";
+            } else {
+                return "User not found or request already exists.";
+            }
+        
+        } catch (SQLException e) {
+            System.err.println("SQL Error in sendFriendRequest: " + e.getMessage());
+            e.printStackTrace();
+            return "Database error occurred";
+        }
+    }
+
+    private boolean friendRequestExists(String username) {
+        final String checkQuery = FriendQuery.checkFriendRequest();
+
+        try (PreparedStatement statement = connection.prepareStatement(checkQuery)) {
+            int currentUserId = DbManager.getAccountID();
+            statement.setInt(1, currentUserId);
+            statement.setString(2, username);
+            statement.setInt(3, currentUserId);
+            statement.setString(4, username);
+            statement.setInt(5, currentUserId);
+
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+                    System.out.println("Existing friend requests found: " + count);
+                    return count > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error checking if friend request exists: " + e.getMessage());
+            return false;
+        }
+
+        return false;
+    }
+
+    public String acceptFriendRequest(String username) {
+        final String query = FriendQuery.acceptFriendRequest();
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, DbManager.getAccountID());
+            statement.setString(2, username);
+            statement.setString(3, username);
+            statement.setInt(4, DbManager.getAccountID());
+
+            int affected = statement.executeUpdate();
+        
+            if (affected == 2) {
+                return "Success";
+            } else {
+                return "Fail";
+            }
+        
+        } catch (SQLException e) {
+            System.err.println("SQL Error in acceptFriendRequest: " + e.getMessage());
+            e.printStackTrace();
+            return "Fail";
+        }
+    }
+
+    public String denyFriendRequest(String username) {
+        final String query = FriendQuery.acceptFriendRequest();
+
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, DbManager.getAccountID());
+            statement.setString(2, username);
+            statement.setString(3, username);
+            statement.setInt(4, DbManager.getAccountID());
+
+            int affected = statement.executeUpdate();
+        
+            if (affected == 2) {
+                return "Success";
+            } else {
+                return "Fail";
+            }
+        
+    } catch (SQLException e) {
+        System.err.println("SQL Error in denyFriendRequest: " + e.getMessage());
+        e.printStackTrace();
+        return "Fail";
+    }
+}
+
+public String removeFriend(String username) {
+    final String query = FriendQuery.denyFriendRequest();
+
+    try (PreparedStatement statement = connection.prepareStatement(query)) {
+        statement.setInt(1, DbManager.getAccountID());
+        statement.setString(2, username);
+        statement.setString(3, username);
+        statement.setInt(4, DbManager.getAccountID());
+
+        int affected = statement.executeUpdate();
+        
+        if (affected == 2) {
+            return "Success";
+        } else {
+            return "Fail";
+        }
+        
+    } catch (SQLException e) {
+        System.err.println("SQL Error in removeFriend: " + e.getMessage());
+        e.printStackTrace();
+        return "Fail";
+    }
+}
 }

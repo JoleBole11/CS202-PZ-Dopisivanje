@@ -3,6 +3,10 @@ package com.example.cs202pzdopisivanje.Network;
 import Enums.Constants;
 import com.example.cs202pzdopisivanje.Database.DbManager;
 import com.example.cs202pzdopisivanje.Requests.*;
+// Add this import at the top
+import com.example.cs202pzdopisivanje.Requests.DenyFriendRequest;
+// Add this import at the top
+import com.example.cs202pzdopisivanje.Requests.RemoveFriendRequest;
 
 
 import java.io.IOException;
@@ -83,7 +87,6 @@ public class Server {
                 else if (received instanceof GroupRequest request) {
                     request.setGroups(DbManager.ChatService().getUserGroups());
                     handler.send(request);
-
                 }
                 else if (received instanceof FriendRequest request) {
                     request.setFriends(DbManager.FriendService().getUserFriends());
@@ -91,6 +94,26 @@ public class Server {
                 }
                 else if (received instanceof FriendReqRequest request) {
                     request.setFriends(DbManager.FriendService().getUserRequests());
+                    handler.send(request);
+                }
+                else if (received instanceof SendFriendRequest request) {
+                    String result = DbManager.FriendService().sendFriendRequest(request.getUsername());
+                    request.setUsername(result);
+                    handler.send(request);
+                }
+                else if (received instanceof AcceptFriendRequest request) {
+                    String result = DbManager.FriendService().acceptFriendRequest(request.getUsername());
+                    request.setUsername(result);
+                    handler.send(request);
+                }
+                else if (received instanceof DenyFriendRequest request) {
+                    String result = DbManager.FriendService().denyFriendRequest(request.getUsername());
+                    request.setUsername(result);
+                    handler.send(request);
+                }
+                else if (received instanceof RemoveFriendRequest request) {
+                    String result = DbManager.FriendService().removeFriend(request.getUsername());
+                    request.setUsername(result);
                     handler.send(request);
                 }
             }

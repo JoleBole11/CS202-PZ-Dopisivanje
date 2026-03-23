@@ -47,7 +47,7 @@
                   </MenuBar>
                </top>
                <center>
-                  <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+                  <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
                      <children>
                         <StackPane prefHeight="400.0" prefWidth="200.0">
                            <children>
@@ -55,6 +55,11 @@
                               <ListView fx:id="groupsList" editable="true" />
                            </children>
                         </StackPane>
+                        <Button fx:id="createGroupButton" alignment="CENTER" disable="true" mnemonicParsing="false" onAction="#OnCreateGroupClick" text="Create Group" visible="false">
+                           <VBox.margin>
+                              <Insets top="10.0" />
+                           </VBox.margin>
+                        </Button>
                      </children></VBox>
                </center>
             </BorderPane>
