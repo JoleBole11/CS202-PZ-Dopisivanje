@@ -7,6 +7,8 @@ import com.example.cs202pzdopisivanje.Requests.*;
 import com.example.cs202pzdopisivanje.Requests.DenyFriendRequest;
 // Add this import at the top
 import com.example.cs202pzdopisivanje.Requests.RemoveFriendRequest;
+// Add this import at the top
+import com.example.cs202pzdopisivanje.Requests.CreateGroupRequest;
 
 
 import java.io.IOException;
@@ -85,7 +87,7 @@ public class Server {
                     handler.send(request);
                 }
                 else if (received instanceof GroupRequest request) {
-                    request.setGroups(DbManager.ChatService().getUserGroups());
+                    request.setGroups(DbManager.GroupService().getUserGroups());
                     handler.send(request);
                 }
                 else if (received instanceof FriendRequest request) {
@@ -114,6 +116,21 @@ public class Server {
                 else if (received instanceof RemoveFriendRequest request) {
                     String result = DbManager.FriendService().removeFriend(request.getUsername());
                     request.setUsername(result);
+                    handler.send(request);
+                }
+                else if (received instanceof CreateGroupRequest request) {
+                    String result = DbManager.GroupService().createGroup(request.getGroupName());
+                    request.setGroupName(result);
+                    handler.send(request);
+                }
+                else if (received instanceof JoinGroupRequest request) {
+                    String result = DbManager.GroupService().addUserToGroup(request.getGroupName(), request.getRole());
+                    request.setGroupName(result);
+                    handler.send(request);
+                }
+                else if (received instanceof SendMessageRequest request) {
+                    int result = DbManager.MessageService().sendMessage(request.getSenderId(), request.getChatId(), request.getMessageText());
+                    request.setChatId(result);
                     handler.send(request);
                 }
             }

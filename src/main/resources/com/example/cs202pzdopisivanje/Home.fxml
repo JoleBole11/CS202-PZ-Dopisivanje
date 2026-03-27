@@ -55,43 +55,101 @@
                               <ListView fx:id="groupsList" editable="true" />
                            </children>
                         </StackPane>
-                        <Button fx:id="createGroupButton" alignment="CENTER" disable="true" mnemonicParsing="false" onAction="#OnCreateGroupClick" text="Create Group" visible="false">
+                        <HBox alignment="CENTER" prefWidth="150.0" VBox.vgrow="ALWAYS">
                            <VBox.margin>
-                              <Insets top="10.0" />
+                              <Insets />
                            </VBox.margin>
-                        </Button>
+                           <children>
+                              <Button fx:id="createGroupButton" alignment="CENTER" mnemonicParsing="false" onAction="#OnCreateGroupMenuClick" text="Create Group" textAlignment="CENTER" HBox.hgrow="ALWAYS">
+                                 <font>
+                                    <Font size="11.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="joinGroupButton" alignment="CENTER" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#OnJoinGroupMenuClick" text="Join Group" textAlignment="CENTER" HBox.hgrow="ALWAYS">
+                                 <font>
+                                    <Font size="11.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                        </HBox>
                      </children></VBox>
                </center>
             </BorderPane>
-            <BorderPane prefHeight="402.0" prefWidth="555.0">
-               <bottom>
-                  <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <StackPane>
+               <children>
+                  <BorderPane fx:id="chatBox" prefHeight="402.0" prefWidth="555.0">
+                     <bottom>
+                        <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                           <children>
+                              <TextArea fx:id="messageTextArea" promptText="Type here..." HBox.hgrow="ALWAYS">
+                                 <HBox.margin>
+                                    <Insets left="10.0" />
+                                 </HBox.margin>
+                              </TextArea>
+                              <Button alignment="CENTER" contentDisplay="CENTER" maxHeight="40.0" maxWidth="60.0" mnemonicParsing="false" onAction="#OnSendButtonClick" text="Send" HBox.hgrow="ALWAYS">
+                                 <HBox.margin>
+                                    <Insets left="20.0" right="20.0" />
+                                 </HBox.margin>
+                                 <opaqueInsets>
+                                    <Insets />
+                                 </opaqueInsets>
+                              </Button>
+                           </children>
+                        </HBox>
+                     </bottom>
+                     <center>
+                        <ScrollPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                           <BorderPane.margin>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </BorderPane.margin>
+                           <content>
+                              <TextFlow maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="347.0" prefWidth="620.0" />
+                           </content>
+                        </ScrollPane>
+                     </center>
+                  </BorderPane>
+                  <VBox fx:id="createGroupVBox" alignment="CENTER" disable="true" prefHeight="200.0" prefWidth="100.0" visible="false">
                      <children>
-                        <TextArea promptText="Type here..." HBox.hgrow="ALWAYS">
-                           <HBox.margin>
-                              <Insets left="10.0" />
-                           </HBox.margin></TextArea>
-                        <Button alignment="CENTER" contentDisplay="CENTER" maxHeight="40.0" maxWidth="60.0" mnemonicParsing="false" text="Send" HBox.hgrow="ALWAYS">
-                           <HBox.margin>
-                              <Insets left="20.0" right="20.0" />
-                           </HBox.margin>
-                           <opaqueInsets>
-                              <Insets />
-                           </opaqueInsets>
+                        <Label text="Group Name">
+                           <VBox.margin>
+                              <Insets bottom="10.0" />
+                           </VBox.margin>
+                        </Label>
+                        <TextField fx:id="createGroupText" promptText="Type in the name of your group">
+                           <VBox.margin>
+                              <Insets bottom="20.0" left="30.0" right="30.0" />
+                           </VBox.margin>
+                        </TextField>
+                        <Button mnemonicParsing="false" onAction="#onCreateGroupClick" text="Create Group">
+                           <VBox.margin>
+                              <Insets bottom="20.0" />
+                           </VBox.margin>
                         </Button>
-                     </children></HBox>
-               </bottom>
-               <center>
-                  <ScrollPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                     <BorderPane.margin>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                     </BorderPane.margin>
-                     <content>
-                        <TextFlow maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="347.0" prefWidth="620.0" />
-                     </content>
-                  </ScrollPane>
-               </center>
-            </BorderPane>
+                        <Label fx:id="errorLabelCreate" text="Error" textFill="RED" visible="false" />
+                     </children>
+                  </VBox>
+                  <VBox fx:id="joinGroupVBox" alignment="CENTER" disable="true" layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="100.0" visible="false">
+                     <children>
+                        <Label text="Group Name">
+                           <VBox.margin>
+                              <Insets bottom="10.0" />
+                           </VBox.margin>
+                        </Label>
+                        <TextField fx:id="joinGroupText" promptText="Type in the name of the group">
+                           <VBox.margin>
+                              <Insets bottom="20.0" left="30.0" right="30.0" />
+                           </VBox.margin>
+                        </TextField>
+                        <Button mnemonicParsing="false" onAction="#onJoinGroupClick" text="Join Group">
+                           <VBox.margin>
+                              <Insets bottom="20.0" />
+                           </VBox.margin>
+                        </Button>
+                        <Label fx:id="errorLabelJoin" text="Error" textFill="RED" visible="false" />
+                     </children>
+                  </VBox>
+               </children>
+            </StackPane>
         </items>
       </SplitPane>
    </center>

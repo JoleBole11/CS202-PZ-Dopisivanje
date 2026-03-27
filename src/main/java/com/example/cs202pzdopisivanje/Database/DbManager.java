@@ -1,10 +1,9 @@
 package com.example.cs202pzdopisivanje.Database;
 
 import Enums.Constants;
-import com.example.cs202pzdopisivanje.Services.ChatService;
-import com.example.cs202pzdopisivanje.Services.FriendService;
-import com.example.cs202pzdopisivanje.Services.UserService;
+import com.example.cs202pzdopisivanje.Services.*;
 
+import javax.swing.*;
 import java.sql.*;
 
 /**
@@ -120,5 +119,31 @@ public class DbManager {
         }
 
         return friendService;
+    }
+
+    private static GroupService groupService = null;
+    public static GroupService GroupService() throws Exception {
+        if (!connected) {
+            throw new Exception(Constants.notConnected);
+        }
+
+        if (groupService == null) {
+            groupService = new GroupService(connection);
+        }
+
+        return groupService;
+    }
+
+    private static MessageService messageService = null;
+    public static MessageService MessageService() throws Exception {
+        if (!connected) {
+            throw new Exception(Constants.notConnected);
+        }
+
+        if (messageService == null) {
+            messageService = new MessageService(connection);
+        }
+
+        return messageService;
     }
 }
