@@ -6,7 +6,11 @@ import com.example.cs202pzdopisivanje.Database.DbManager;
 import com.example.cs202pzdopisivanje.HomeApplication;
 import com.example.cs202pzdopisivanje.Network.Client;
 import com.example.cs202pzdopisivanje.Objects.Chat;
+import com.example.cs202pzdopisivanje.Objects.Message;
 import com.example.cs202pzdopisivanje.Requests.*;
+import com.example.cs202pzdopisivanje.Services.MessageService;
+import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -14,6 +18,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 import java.io.IOException;
 import java.util.List;
@@ -42,9 +48,14 @@ public class HomeController {
     private TextField joinGroupText;
     @FXML
     private TextArea messageTextArea;
+    @FXML
+    private ScrollPane chatScrollPane;
+    @FXML
+    private TextFlow chatTextFlow;
+
 
     private final ObservableList<String> friends = FXCollections.observableArrayList();
-    private final ObservableList<Chat> groups = FXCollections.observableArrayList(); // Changed to Chat
+    private final ObservableList<Chat> groups = FXCollections.observableArrayList();
     
     // Keep track of currently selected chat
     private Chat selectedChat = null;
@@ -55,6 +66,8 @@ public class HomeController {
             friendsList.setItems(friends);
             friendsList.toFront();
         }
+
+        chatTextFlow.heightProperty().addListener((obs, oldHeight, newHeight) -> chatScrollPane.setVvalue(1.0));
 
         // Set up custom cell factory for groups ListView
         if (groupsList != null) {
@@ -67,6 +80,7 @@ public class HomeController {
                     if (selectedChat != null) {
                         System.out.println("Selected chat: " + selectedChat.getChatName() + 
                                          " (ID: " + selectedChat.getChatId() + ")");
+                        onChatSelectionChanged(selectedChat);
                     }
                 }
             );
@@ -104,6 +118,47 @@ public class HomeController {
         } catch (Exception e) {
             System.out.println("Error loading groups or friends: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private void onChatSelectionChanged(Chat newValue) {
+        if (newValue != null) {
+            selectedChat = newValue;
+            // When a new chat is selected, clear the old messages and fetch the new ones.
+            chatTextFlow.getChildren().clear();
+            fetchAndDisplayMessages(selectedChat.getChatId());
+        }
+    }
+
+    private void fetchAndDisplayMessages(int chatId) {
+        GetMessagesRequest request = new GetMessagesRequest(chatId);
+
+        new Thread(() -> {
+            try {
+                // This is an example of how you might send a request and get a response.
+                // You MUST replace this with your actual client-side networking implementation.
+                Client.getHandler().send(new GetMessagesRequest(chatId));
+                GetMessagesRequest response = (GetMessagesRequest) Client.getHandler().tryReceive();
+
+                if (response != null) {
+                    List<Message> messages = ((GetMessagesRequest) response).getMessages();
+                    // UI updates must run on the JavaFX Application Thread.
+                    Platform.runLater(() -> updateChatView(messages));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                // Optionally, show an error message in the UI on the JavaFX thread.
+            }
+        }).start();
+    }
+
+    private void updateChatView(List<Message> messages) {
+        chatTextFlow.getChildren().clear();
+        if (messages != null) {
+            for (Message msg : messages) {
+                Text messageText = new Text(msg.getUsername() + ": " + msg.getMessage() + "\n");
+                chatTextFlow.getChildren().add(messageText);
+            }
         }
     }
 
@@ -168,13 +223,13 @@ public class HomeController {
             }
 
             // Create request for group creation
-            JoinGroupRequest joinRequest = new JoinGroupRequest(DbManager.getAccountID(), groupName, "member");
+            CreateGroupRequest createRequest = new CreateGroupRequest(groupName, 1);
             
             // Send the request
-            Client.getHandler().send(joinRequest);
+            Client.getHandler().send(createRequest);
             
             // Wait for response
-            JoinGroupRequest response = (JoinGroupRequest) Client.getHandler().tryReceive();
+            CreateGroupRequest response = (CreateGroupRequest) Client.getHandler().tryReceive();
             
             if (response != null) {
                 showSuccess("Group '" + groupName + "' created successfully!", errorLabelCreate);

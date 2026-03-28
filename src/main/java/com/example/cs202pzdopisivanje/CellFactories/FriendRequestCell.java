@@ -1,9 +1,11 @@
 package com.example.cs202pzdopisivanje.CellFactories;
 
+import com.example.cs202pzdopisivanje.Database.DbManager;
 import com.example.cs202pzdopisivanje.Network.Client;
 import com.example.cs202pzdopisivanje.Objects.FriendRequestObject;
 import com.example.cs202pzdopisivanje.Requests.AcceptFriendRequest;
 import com.example.cs202pzdopisivanje.Requests.DenyFriendRequest;
+import com.example.cs202pzdopisivanje.Requests.JoinGroupRequest;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -59,6 +61,10 @@ public class FriendRequestCell extends ListCell<FriendRequestObject> {
         try {
             Client.getHandler().send(new AcceptFriendRequest(item.getName()));
             AcceptFriendRequest response = (AcceptFriendRequest) Client.getHandler().tryReceive();
+
+
+
+            //Client.getHandler().send(new JoinGroupRequest(DbManager.getAccountID(), ))
             
             if (Objects.equals(response.getUsername(), "Success")) {
                 Platform.runLater(() -> getListView().getItems().remove(item));

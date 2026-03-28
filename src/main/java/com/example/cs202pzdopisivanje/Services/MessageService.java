@@ -33,8 +33,6 @@ public class MessageService {
      */
     public int sendMessage(int senderId, int chatId, String messageText) {
         try {
-            String currentTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-            
             PreparedStatement statement = connection.prepareStatement(
                 MessageQuery.INSERT_MESSAGE, 
                 Statement.RETURN_GENERATED_KEYS
@@ -43,14 +41,13 @@ public class MessageService {
             statement.setInt(1, senderId);
             statement.setInt(2, chatId);
             statement.setString(3, messageText);
-            statement.setString(4, currentTime);
             
             int affectedRows = statement.executeUpdate();
             
             if (affectedRows > 0) {
                 ResultSet generatedKeys = statement.getGeneratedKeys();
                 if (generatedKeys.next()) {
-                    return generatedKeys.getInt(3);
+                    return generatedKeys.getInt(1);
                 }
             }
             
@@ -70,91 +67,29 @@ public class MessageService {
      */
     public List<Message> getMessagesByChatId(int chatId) {
         List<Message> messages = new ArrayList<>();
-        
+
         try {
-            PreparedStatement statement = connection.prepareStatement(MessageQuery.GET_MESSAGES_BY_CHAT_ID);
+            PreparedStatement statement = connection.prepareStatement(MessageQuery.getMessagesById());
             statement.setInt(1, chatId);
-            
+
             ResultSet resultSet = statement.executeQuery();
-            
+
             while (resultSet.next()) {
                 Message message = new Message(
-                    resultSet.getInt("id"),
-                    resultSet.getInt("sender_id"),
-                    resultSet.getInt("chat_id"),
-                    resultSet.getString("message_text"),
-                    resultSet.getString("time_sent")
+                        resultSet.getInt("message_id"),
+                        resultSet.getString("username"),
+                        resultSet.getInt("chat_id"),
+                        resultSet.getString("message_string"),
+                        resultSet.getString("time_sent")
                 );
                 messages.add(message);
             }
-            
+
         } catch (SQLException e) {
-            System.err.println("Error retrieving messages: " + e.getMessage());
+            System.err.println("Error retrieving latest messages: " + e.getMessage());
             e.printStackTrace();
         }
-        
+
         return messages;
-    }
-
-    /**
-     * Retrieves a specific message by its ID.
-     * 
-     * @param messageId The ID of the message
-     * @return The Message object, or null if not found
-     */
-    public Message getMessageById(int messageId) {
-        try {
-            PreparedStatement statement = connection.prepareStatement(MessageQuery.GET_MESSAGE_BY_ID);
-            statement.setInt(1, messageId);
-            
-            ResultSet resultSet = statement.executeQuery();
-            
-            if (resultSet.next()) {
-                return new Message(
-                    resultSet.getInt("id"),
-                    resultSet.getInt("sender_id"),
-                    resultSet.getInt("chat_id"),
-                    resultSet.getString("message_text"),
-                    resultSet.getString("time_sent")
-                );
-            }
-            
-        } catch (SQLException e) {
-            System.err.println("Error retrieving message: " + e.getMessage());
-            e.printStackTrace();
-        }
-        
-        return null;
-    }
-
-    /**
-     * Gets the latest message from a specific chat.
-     * 
-     * @param chatId The ID of the chat
-     * @return The latest Message object, or null if no messages found
-     */
-    public Message getLatestMessageByChatId(int chatId) {
-        try {
-            PreparedStatement statement = connection.prepareStatement(MessageQuery.GET_LATEST_MESSAGE_BY_CHAT_ID);
-            statement.setInt(1, chatId);
-            
-            ResultSet resultSet = statement.executeQuery();
-            
-            if (resultSet.next()) {
-                return new Message(
-                    resultSet.getInt("id"),
-                    resultSet.getInt("sender_id"),
-                    resultSet.getInt("chat_id"),
-                    resultSet.getString("message_text"),
-                    resultSet.getString("time_sent")
-                );
-            }
-            
-        } catch (SQLException e) {
-            System.err.println("Error retrieving latest message: " + e.getMessage());
-            e.printStackTrace();
-        }
-        
-        return null;
     }
 }

@@ -119,20 +119,25 @@ public class Server {
                     handler.send(request);
                 }
                 else if (received instanceof CreateGroupRequest request) {
-                    String result = DbManager.GroupService().createGroup(request.getGroupName());
+                    String result = DbManager.GroupService().createGroup(request.getGroupName(), request.getIsGroup());
                     request.setGroupName(result);
                     handler.send(request);
                 }
                 else if (received instanceof JoinGroupRequest request) {
-                    String result = DbManager.GroupService().addUserToGroup(request.getGroupName(), request.getRole());
+                    String result = DbManager.GroupService().addUserToGroup(request.getGroupName(), request.getUserId(),request.getRole());
                     request.setGroupName(result);
                     handler.send(request);
                 }
                 else if (received instanceof SendMessageRequest request) {
-                    int result = DbManager.MessageService().sendMessage(request.getSenderId(), request.getChatId(), request.getMessageText());
+                    int result = DbManager.MessageService().sendMessage(DbManager.getAccountID(), request.getChatId(), request.getMessageText());
                     request.setChatId(result);
                     handler.send(request);
                 }
+                else if (received instanceof GetMessagesRequest request) {
+                    request.setMessages(DbManager.MessageService().getMessagesByChatId(request.getChatId()));
+                    handler.send(request);
+                }
+
             }
         }
         stop();

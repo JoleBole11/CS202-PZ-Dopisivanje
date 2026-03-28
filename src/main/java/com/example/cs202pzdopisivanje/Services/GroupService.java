@@ -29,9 +29,9 @@ public class GroupService {
      * @param groupName The name of the group to create
      * @return "Success" if a group is created successfully, error message otherwise
      */
-    public String createGroup(String groupName) {
+    public String createGroup(String groupName, int isGroup) {
 
-        if (groupExists(groupName.trim())) {
+        if (groupExists(groupName)) {
             return "Exists";
         }
 
@@ -39,14 +39,14 @@ public class GroupService {
             connection.setAutoCommit(false); // Start transaction
             
             // Create the group
-            int groupId = insertGroup(connection, groupName.trim());
+            int groupId = insertGroup(groupName, isGroup);
             if (groupId == -1) {
                 connection.rollback();
                 return "Failed to create group";
             }
             
             // Add the creator as a member of the group
-            if (Objects.equals(addUserToGroup(groupName, "creator"), "Error")) {
+            if (Objects.equals(addUserToGroup(groupName, DbManager.getAccountID(),"creator"), "Error")) {
                 connection.rollback();
                 return "Failed to add creator to group";
             }
@@ -95,16 +95,16 @@ public class GroupService {
     
     /**
      * Inserts a new group into the database.
-     * 
-     * @param conn The database connection
+     *
      * @param groupName The name of the group
      * @return The ID of the created group, or -1 if failed
      */
-    private int insertGroup(Connection conn, String groupName) {
+    public int insertGroup(String groupName, int isGroup) {
         final String query = GroupQuery.createGroup();
         
         try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, groupName);
+            statement.setInt(2, isGroup);
             
             int affected = statement.executeUpdate();
             
@@ -128,12 +128,12 @@ public class GroupService {
      * @param groupName The Name of the group
      * @return true if successful, false otherwise
      */
-    public String addUserToGroup(String groupName, String role) {
+    public String addUserToGroup(String groupName, int userId, String role) {
         final String query = GroupQuery.addUserToGroup();
         
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, groupName);
-            statement.setInt(2, DbManager.getAccountID());
+            statement.setInt(1, userId);
+            statement.setString(2, groupName);
             statement.setString(3, role);
             
             int affected = statement.executeUpdate();
@@ -157,48 +157,29 @@ public class GroupService {
         final String query = GroupQuery.getGroups();
         List<Chat> groups = new ArrayList<>();
 
-        System.out.println("DEBUG: Getting groups for user ID: " + DbManager.getAccountID());
-        System.out.println("DEBUG: Query: " + query);
-
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, DbManager.getAccountID());
-
-            System.out.println("DEBUG: Executing query with parameter: " + DbManager.getAccountID());
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 boolean hasResults = false;
                 while (resultSet.next()) {
                     hasResults = true;
                     int chatId = resultSet.getInt("CHAT_ID");
-                    System.out.println("DEBUG: Found group with CHAT_ID: " + chatId);
-
-                    // Create Chat object with ID and name
                     String chatName;
                     try {
                         chatName = resultSet.getString("CHAT_NAME");
-                        if (chatName == null) {
-                            chatName = "Group " + chatId;
-                        }
                     } catch (SQLException e) {
-                        // Column doesn't exist, use default name
-                        chatName = "Group " + chatId;
+                        throw new RuntimeException(e);
                     }
-                    
-                    // Create and add Chat object instead of just the string
+
                     Chat chat = new Chat(chatId, chatName);
                     groups.add(chat);
                 }
-
-                if (!hasResults) {
-                    System.out.println("DEBUG: No results found for user ID: " + DbManager.getAccountID());
-                }
             }
         } catch (SQLException e) {
-            System.out.println("DEBUG: SQL Error: " + e.getMessage());
             throw new RuntimeException(e);
         }
 
-        System.out.println("DEBUG: Returning " + groups.size() + " groups");
         return groups;
     }
 }

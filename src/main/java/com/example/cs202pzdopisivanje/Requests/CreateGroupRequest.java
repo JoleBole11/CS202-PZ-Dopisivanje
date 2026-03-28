@@ -1,20 +1,12 @@
 package com.example.cs202pzdopisivanje.Requests;
 
 public class CreateGroupRequest extends Request {
-    private int userId;
     private String groupName;
+    private int isGroup;
 
-    public CreateGroupRequest(int userId, String groupName) {
-        this.userId = userId;
+    public CreateGroupRequest(String groupName, int isGroup) {
         this.groupName = groupName;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
+        this.isGroup = isGroup;
     }
 
     public String getGroupName() {
@@ -23,5 +15,13 @@ public class CreateGroupRequest extends Request {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+
+    public int getIsGroup() {
+        return isGroup;
+    }
+
+    public void setIsGroup(int isGroup) {
+        this.isGroup = isGroup;
     }
 }
