@@ -1,10 +1,8 @@
 package com.example.cs202pzdopisivanje.Controllers;
 
 import Enums.SceneEnum;
-import com.example.cs202pzdopisivanje.Database.DbManager;
 import com.example.cs202pzdopisivanje.HomeApplication;
 import com.example.cs202pzdopisivanje.Network.Client;
-import com.example.cs202pzdopisivanje.Requests.LoginRequest;
 import com.example.cs202pzdopisivanje.Requests.RegisterRequest;
 import com.example.cs202pzdopisivanje.Requests.UsernameRequest;
 import javafx.event.ActionEvent;
@@ -14,6 +12,10 @@ import javafx.scene.control.TextField;
 
 import java.io.IOException;
 
+/**
+ * RegisterController manages all the functions of the Register page in the application.
+ * Is used for registering a new profile for the application and checks for the username to be unique.
+ */
 public class RegisterController {
 
     @FXML
@@ -25,11 +27,18 @@ public class RegisterController {
     @FXML
     private Label errorLabel;
 
+    /**
+     * Returns user to the login page.
+     */
     @FXML
     public void OnCancelButtonClick(ActionEvent actionEvent) {
         HomeApplication.switchScene(SceneEnum.LOGIN);
     }
 
+    /**
+     * Attempts to register a new user with given information and log in.
+     * Checks if the username is taken.
+     */
     @FXML
     public void OnRegisterButtonClick(ActionEvent actionEvent) throws IOException {
 
@@ -63,7 +72,10 @@ public class RegisterController {
         HomeApplication.switchScene(SceneEnum.HOME);
     }
 
-    /** Sets the text to display the error when logging in. */
+    /**
+     * showError displays an error.
+     * @param s Text that will be displayed.
+     */
     private void showError(String s) {
         if (errorLabel != null) {
             errorLabel.setText(s);

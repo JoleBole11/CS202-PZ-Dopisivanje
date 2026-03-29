@@ -1,5 +1,8 @@
 package com.example.cs202pzdopisivanje.Objects;
 
+/**
+ * Represents the User object.
+ */
 public class User {
     private int userId;
     private String username;

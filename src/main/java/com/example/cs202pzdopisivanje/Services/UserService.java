@@ -22,7 +22,13 @@ public class UserService {
         this.connection = connection;
     }
 
-
+    /**
+     * Logs the user into the application.
+     *
+     * @param username The entered username
+     * @param password The entered password
+     * @return The ID of the User, or -1 if failed
+     */
     public int login(String username, String password) {
         final String query = UserQuery.getUserByUsernameAndPassword();
 
@@ -41,6 +47,13 @@ public class UserService {
         return -1;
     }
 
+    /**
+     * Register a new profile and enters the application.
+     *
+     * @param username The entered username
+     * @param password The entered password
+     * @return The ID of the User, or -1 if failed
+     */
     public int register(String username, String password) {
         final String query = UserQuery.insertUser();
 
@@ -66,6 +79,12 @@ public class UserService {
         return -1;
     }
 
+    /**
+     * Checks if a user with the given username exists in the database.
+     *
+     * @param username The entered username
+     * @return The Username of the User, or null if failed
+     */
     public String checkIfUserExists(String username) {
         final String query = UserQuery.getUserByUsername();
         try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -81,6 +100,13 @@ public class UserService {
         return null;
     }
 
+    /**
+     * Edit the current user.
+     *
+     * @param userId The ID of the current user
+     * @param username The entered username
+     * @param password The entered password
+     */
     public void editUser(int userId, String username, String password) {
         final String query = UserQuery.editUser();
 

@@ -1,5 +1,8 @@
 package com.example.cs202pzdopisivanje.Requests;
 
+/**
+ * Represents the communication request for removing a friend.
+ */
 public class RemoveFriendRequest extends Request {
     private String username;
     

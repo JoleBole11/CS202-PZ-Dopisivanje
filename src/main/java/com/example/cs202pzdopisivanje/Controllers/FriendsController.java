@@ -19,14 +19,15 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
-// Add these imports at the top
-import com.example.cs202pzdopisivanje.Requests.RemoveFriendRequest;
 import com.example.cs202pzdopisivanje.Objects.Chat;
-import com.example.cs202pzdopisivanje.CellFactories.ChatCell;
 
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * FriendsController manages all the functions of the Friends page in the application.
+ * Supports checking and removing friends, checking sent and received requests and sending requests.
+ */
 public class FriendsController {
 
     public ListView<Chat> friendsList;
@@ -44,11 +45,17 @@ public class FriendsController {
     private final ObservableList<FriendRequestObject> requests = FXCollections.observableArrayList();
     private final ObservableList<FriendRequestObject> sent = FXCollections.observableArrayList();
 
+    /**
+     * Changes the scene when the back button is clicked.
+     */
     @FXML
     public void OnBackButtonClick(ActionEvent actionEvent) {
         HomeApplication.switchScene(SceneEnum.HOME);
     }
-    
+
+    /**
+     * Is run on opening the friend's page.
+     */
     @FXML
     public void initialize() {
         if (friendsList != null) {
@@ -74,10 +81,10 @@ public class FriendsController {
 
             if (response != null && response.getFriends() != null) {
                 friends.clear();
-                friends.addAll(response.getFriends()); // Now List<Chat>
+                friends.addAll(response.getFriends());
                 System.out.println("Loaded " + friends.size() + " friends");
             } else {
-                System.out.println("No friends received or response was null");
+                System.out.println("No friends received");
             }
 
             if (response2 != null && response2.getFriendsRequests() != null) {
@@ -94,13 +101,16 @@ public class FriendsController {
                 requestsList.setItems(requests);
                 sentList.setItems(sent);
             } else {
-                System.out.println("No requests received or response was null");
+                System.out.println("No requests received");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Changes display to friends when the button is clicked.
+     */
     public void OnFriendsButtonClick(ActionEvent actionEvent) {
         try {
             Client.getHandler().send(new FriendRequest(DbManager.getAccountID()));
@@ -135,6 +145,9 @@ public class FriendsController {
         }
     }
 
+    /**
+     * Changes display to received requests when the button is clicked.
+     */
     public void OnRequestsButtonClick(ActionEvent actionEvent) {
         try {
             Client.getHandler().send(new FriendReqRequest(DbManager.getAccountID()));
@@ -176,6 +189,9 @@ public class FriendsController {
         }
     }
 
+    /**
+     * Changes display to sent requests when the button is clicked.
+     */
     public void OnSentButtonClick(ActionEvent actionEvent) {
         try {
             Client.getHandler().send(new FriendReqRequest(DbManager.getAccountID()));
@@ -217,6 +233,9 @@ public class FriendsController {
         }
     }
 
+    /**
+     * Changes display to send requests when the button is clicked.
+     */
     public void OnAddFriendButtonClick(ActionEvent actionEvent) {
         addFriendPage.toFront();
         sentList.toBack();
@@ -232,6 +251,9 @@ public class FriendsController {
         requestsList.setVisible(false);
     }
 
+    /**
+     * Sends a friend request.
+     */
     public void onSendRequestButton(ActionEvent actionEvent) throws IOException {
         String username = friendUsernameField.getText();
 
@@ -263,6 +285,10 @@ public class FriendsController {
         showSuccess("Friend request sent.");
     }
 
+    /**
+     * showError displays an error.
+     * @param s Text that will be displayed.
+     */
     private void showError(String s) {
         if (errorLabel != null) {
             errorLabel.setText(s);
@@ -271,6 +297,10 @@ public class FriendsController {
         }
     }
 
+    /**
+     * showError displays a success.
+     * @param s Text that will be displayed.
+     */
     private void showSuccess(String s) {
         if (errorLabel != null) {
             errorLabel.setText(s);

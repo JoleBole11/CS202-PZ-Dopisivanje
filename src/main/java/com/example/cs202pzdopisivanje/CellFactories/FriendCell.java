@@ -16,6 +16,9 @@ import javafx.scene.layout.Region;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * Custom cell factory for displaying Friend objects in ListView.
+ */
 public class FriendCell extends ListCell<Chat> {
 
     private final HBox hBox = new HBox(10);
@@ -45,7 +48,10 @@ public class FriendCell extends ListCell<Chat> {
 
         setGraphic(hBox);
     }
-    
+
+    /**
+     * Removes Friend when button is clicked.
+     */
     private void removeFriend(Chat friendChat) {
         try {
             Client.getHandler().send(new RemoveFriendRequest(friendChat.getChatName()));
@@ -55,10 +61,9 @@ public class FriendCell extends ListCell<Chat> {
                 Platform.runLater(() -> getListView().getItems().remove(friendChat));
                 System.out.println("Friend removed successfully");
             } else {
-                System.err.println("Failed to remove friend: " + response.getUsername());
+                System.out.println("Failed to remove friend: " + response.getUsername());
             }
         } catch (IOException e) {
-            System.err.println("Error removing friend: " + e.getMessage());
             e.printStackTrace();
         }
     }

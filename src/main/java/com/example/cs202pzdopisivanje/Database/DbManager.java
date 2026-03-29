@@ -95,19 +95,6 @@ public class DbManager {
         return userService;
     }
 
-    private static ChatService chatService = null;
-    public static ChatService ChatService() throws Exception {
-        if (!connected) {
-            throw new Exception(Constants.notConnected);
-        }
-
-        if (chatService == null) {
-            chatService = new ChatService(connection);
-        }
-
-        return chatService;
-    }
-
     private static FriendService friendService = null;
     public static FriendService FriendService() throws Exception {
         if (!connected) {

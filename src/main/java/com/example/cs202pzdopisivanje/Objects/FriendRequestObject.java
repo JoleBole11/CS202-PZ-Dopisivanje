@@ -2,6 +2,9 @@ package com.example.cs202pzdopisivanje.Objects;
 
 import java.io.Serializable;
 
+/**
+ * Represents the Friend Request Object.
+ */
 public class FriendRequestObject implements Serializable {
     private String name;
     private String type;

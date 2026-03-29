@@ -1,5 +1,8 @@
 package com.example.cs202pzdopisivanje.Requests;
 
+/**
+ * Represents the communication request for registering a new profile.
+ */
 public class RegisterRequest extends Request{
     private String username;
     private String password;

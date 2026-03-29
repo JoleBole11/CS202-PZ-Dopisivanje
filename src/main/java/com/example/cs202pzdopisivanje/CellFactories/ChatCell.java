@@ -16,7 +16,6 @@ public class ChatCell extends ListCell<Chat> {
             setText(null);
             setGraphic(null);
         } else {
-            // Display the chat name in the list
             setText(chat.getChatName());
         }
     }

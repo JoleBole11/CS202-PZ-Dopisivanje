@@ -26,6 +26,11 @@ public class FriendService {
         this.connection = connection;
     }
 
+    /**
+     * Gets all the current users friends.
+     *
+     * @return List of Chat objects representing the friends
+     */
     public List<Chat> getUserFriends() {
         final String query = FriendQuery.getFriends();
         List<Chat> friends = new ArrayList<>();
@@ -40,11 +45,10 @@ public class FriendService {
                 while (resultSet.next()) {
                     try {
                         String friendName = resultSet.getString("USERNAME");
-                        String currentUsername = getCurrentUsername();
+                        String currentUsername = getUsernameById();
                         String chatName1 = currentUsername + friendName;
                         String chatName2 = friendName + currentUsername;
-                        
-                        // Find the chat ID for this friendship
+
                         int chatId = findChatIdByName(chatName1);
                         if (chatId == -1) {
                             chatId = findChatIdByName(chatName2);
@@ -64,6 +68,11 @@ public class FriendService {
         return friends;
     }
 
+    /**
+     * Gets all the current users' friend requests.
+     *
+     * @return List of FriendRequest objects representing the requests
+     */
     public List<FriendRequestObject> getUserRequests() {
         final String query = FriendQuery.getRequests();
         List<FriendRequestObject> friendRequests = new ArrayList<>();
@@ -94,19 +103,22 @@ public class FriendService {
         return friendRequests;
     }
 
+    /**
+     * Sends a friend request to a specific user.
+     *
+     * @param username The username to whom it will be sent
+     * @return "Success" if successful, "Error" or "Exists" otherwise
+     */
     public String sendFriendRequest(String username){
-        // First check if the user exists and get their ID
         int friendUserId = getUserIdByUsername(username);
         if (friendUserId == -1) {
-            return "User not found";
+            return "Error";
         }
-        
-        // Prevent sending friend request to yourself
+
         if (friendUserId == DbManager.getAccountID()) {
-            return "Cannot send friend request to yourself";
+            return "Error";
         }
-        
-        // Check if any relationship already exists between these users
+
         if (anyRelationshipExists(DbManager.getAccountID(), friendUserId)) {
             return "Exists";
         }
@@ -114,7 +126,6 @@ public class FriendService {
         final String query = FriendQuery.sendFriendRequest();
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-            // Use user IDs instead of usernames to avoid conflicts
             statement.setInt(1, DbManager.getAccountID());
             statement.setInt(2, friendUserId);
             statement.setInt(3, friendUserId);
@@ -125,23 +136,23 @@ public class FriendService {
             if (affected >= 1) {
                 return "Success";
             } else {
-                return "Failed to send friend request";
+                return "Error";
             }
         
         } catch (SQLException e) {
-            // Check if it's a duplicate entry error
-            if (e.getMessage().contains("Duplicate entry")) {
-                return "Friend request already exists";
-            }
-        
-            System.err.println("SQL Error in sendFriendRequest: " + e.getMessage());
             e.printStackTrace();
-            return "Database error occurred";
+            return "Error";
         }
     }
 
+    /**
+     * Retrieves a user's ID by their username.
+     *
+     * @param username The username of the user
+     * @return The ID of the user
+     */
     private int getUserIdByUsername(String username) {
-        final String query = "SELECT user_id FROM user WHERE USERNAME = ?";
+        final String query = FriendQuery.getIDByUsername();
         
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, username);
@@ -158,9 +169,15 @@ public class FriendService {
         return -1;
     }
 
+    /**
+     * Checks if a friend relationship between 2 users exists.
+     *
+     * @param userId1 The ID of the first user
+     * @param userId2 The ID of the second user
+     * @return True if exists, false otherwise
+     */
     private boolean anyRelationshipExists(int userId1, int userId2) {
-        final String checkQuery = "SELECT COUNT(*) FROM friends WHERE " +
-                                  "(USER_ID = ? AND FRIEND_ID = ?) OR (USER_ID = ? AND FRIEND_ID = ?)";
+        final String checkQuery = FriendQuery.checkRelationship();
 
         try (PreparedStatement statement = connection.prepareStatement(checkQuery)) {
             statement.setInt(1, userId1);
@@ -177,12 +194,18 @@ public class FriendService {
             }
         } catch (SQLException e) {
             System.err.println("Error checking if relationship exists: " + e.getMessage());
-            return true; // Return true to prevent insertion in case of error
+            return true;
         }
 
         return false;
     }
 
+    /**
+     * Accepts a friend request and creates a chat between them.
+     *
+     * @param username The username of the user
+     * @return "Success" if successful, "Fail" otherwise
+     */
     public String acceptFriendRequest(String username) {
         final String query = FriendQuery.acceptFriendRequest();
 
@@ -195,7 +218,6 @@ public class FriendService {
             int affected = statement.executeUpdate();
         
             if (affected >= 1) {
-                // Create a private chat between the two friends
                 createPrivateChat(username);
                 return "Success";
             } else {
@@ -203,26 +225,26 @@ public class FriendService {
             }
         
         } catch (SQLException e) {
-            System.err.println("SQL Error in acceptFriendRequest: " + e.getMessage());
             e.printStackTrace();
             return "Fail";
         }
     }
 
+    /**
+     * Creates a chat between 2 friends.
+     *
+     * @param friendUsername The username of the friend
+     */
     private void createPrivateChat(String friendUsername) {
         try {
-            // Get the current user's username
-            String currentUsername = getCurrentUsername();
-            
-            // Create chat name combining both usernames
+            String currentUsername = getUsernameById();
+
             String chatName = currentUsername + friendUsername;
-            
-            // Use GroupService to create a private chat (is_group = 0)
+
             GroupService groupService = new GroupService(connection);
-            int chatId = groupService.insertGroup(chatName, 0); // 0 for is_group = false
+            int chatId = groupService.insertGroup(chatName, 0);
             
             if (chatId != -1) {
-                // Add both users to the chat
                 addUsersToChat(chatId, DbManager.getAccountID(), friendUsername);
                 System.out.println("Private chat created successfully with ID: " + chatId);
             } else {
@@ -230,13 +252,17 @@ public class FriendService {
             }
             
         } catch (Exception e) {
-            System.out.println("Error creating private chat: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private String getCurrentUsername() {
-        final String query = "SELECT USERNAME FROM user WHERE USER_ID = ?";
+    /**
+     * Gets the username by a user's ID.
+     *
+     * @return The username of the user
+     */
+    private String getUsernameById() {
+        final String query = FriendQuery.getUsernameByID();
         
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, DbManager.getAccountID());
@@ -247,40 +273,49 @@ public class FriendService {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error getting current username: " + e.getMessage());
+            e.printStackTrace();
         }
         
-        return "Unknown";
+        return "Error";
     }
 
-    private void addUsersToChat(int chatId, int currentUserId, String friendUsername) {
-        // Get friend's user ID
+    /**
+     * Adds friends to a Friend Chat.
+     *
+     * @param chatId The ID of the chat
+     * @param UserId The ID of the current user
+     * @param friendUsername The username of the friend
+     */
+    private void addUsersToChat(int chatId, int UserId, String friendUsername) {
         int friendUserId = getUserIdByUsername(friendUsername);
         
         if (friendUserId == -1) {
             System.err.println("Could not find friend's user ID");
             return;
         }
-        
-        // Add both users to the chat (assuming there's a chat_members table)
-        final String insertMemberQuery = "INSERT INTO chat_members (CHAT_ID, USER_ID) VALUES (?, ?)";
+
+        final String insertMemberQuery = FriendQuery.insertUserIntoFriends();
         
         try (PreparedStatement statement = connection.prepareStatement(insertMemberQuery)) {
-            // Add current user
             statement.setInt(1, chatId);
-            statement.setInt(2, currentUserId);
+            statement.setInt(2, UserId);
             statement.executeUpdate();
-            
-            // Add friend
+
             statement.setInt(1, chatId);
             statement.setInt(2, friendUserId);
             statement.executeUpdate();
         
     } catch (SQLException e) {
-        System.err.println("Error adding users to chat: " + e.getMessage());
+        e.printStackTrace();
     }
 }
 
+    /**
+     * Denies a friend request and deletes it from the database.
+     *
+     * @param username The username of the friend
+     * @return "Success" if successful, "Fail" otherwise
+     */
     public String denyFriendRequest(String username) {
         final String query = FriendQuery.denyFriendRequest();
 
@@ -299,12 +334,17 @@ public class FriendService {
             }
         
         } catch (SQLException e) {
-            System.err.println("SQL Error in denyFriendRequest: " + e.getMessage());
             e.printStackTrace();
             return "Fail";
         }
     }
 
+    /**
+     * Removes a friend of the user and deletes it from the database.
+     *
+     * @param username The username of the friend
+     * @return "Success" if successful, "Fail" otherwise
+     */
     public String removeFriend(String username) {
         final String query = FriendQuery.removeFriend();
 
@@ -317,7 +357,6 @@ public class FriendService {
             int affected = statement.executeUpdate();
             
             if (affected >= 1) {
-                // Delete the private chat between the two friends
                 deletePrivateChat(username);
                 return "Success";
             } else {
@@ -325,27 +364,25 @@ public class FriendService {
             }
             
         } catch (SQLException e) {
-            System.err.println("SQL Error in removeFriend: " + e.getMessage());
             e.printStackTrace();
             return "Fail";
         }
     }
 
+    /**
+     * Deletes Chat from the database.
+     */
     private void deletePrivateChat(String friendUsername) {
         try {
-            // Get the current user's username
-            String currentUsername = getCurrentUsername();
+            String currentUsername = getUsernameById();
 
-            // Create both possible chat name combinations
             String chatName1 = currentUsername + friendUsername;
             String chatName2 = friendUsername + currentUsername;
 
-            // Find and delete the chat by searching for both name patterns
             int chatId = findChatIdByName(chatName1);
             if (chatId == -1) {
                 chatId = findChatIdByName(chatName2);
             }
-
 
             if (chatId != -1) {
                 deleteChatById(chatId);
@@ -356,17 +393,21 @@ public class FriendService {
             }
 
         } catch (Exception e) {
-            System.err.println("Error deleting private chat: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private int findChatIdByName(String chatName1) {
-        // Assuming the chat table is named 'chat' based on your GroupService
-        final String query = "SELECT CHAT_ID FROM chat WHERE CHAT_NAME = ?";
+    /**
+     * Retrieves a Chats ID by its name.
+     *
+     * @param chatName The name of the Chat
+     * @return The ID of the user
+     */
+    private int findChatIdByName(String chatName) {
+        final String query = FriendQuery.getChatIDByName();
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, chatName1);
+            statement.setString(1, chatName);
 
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next()) {
@@ -374,22 +415,26 @@ public class FriendService {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error finding chat by name: " + e.getMessage());
+            e.printStackTrace();
         }
 
         return -1;
     }
 
+    /**
+     * Deletes a Chat by its ID.
+     *
+     * @param chatId The ID of the chat
+     */
     private void deleteChatById(int chatId) {
-        // Assuming the chat table is named 'chat' based on your GroupService
-        final String query = "DELETE FROM chat WHERE CHAT_ID = ?";
+        final String query = FriendQuery.deleteChatByID();
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, chatId);
             int deleted = statement.executeUpdate();
             System.out.println("Deleted " + deleted + " chat with ID: " + chatId);
         } catch (SQLException e) {
-            System.err.println("Error deleting chat: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }

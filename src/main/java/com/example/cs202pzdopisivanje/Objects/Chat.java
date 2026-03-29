@@ -3,6 +3,9 @@ package com.example.cs202pzdopisivanje.Objects;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * Represents the Chat object.
+ */
 public class Chat implements Serializable {
     private int chatId;
     private String chatName;
@@ -39,10 +42,5 @@ public class Chat implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(chatId, chatName);
-    }
-    
-    @Override
-    public String toString() {
-        return chatName; // This will be used if ChatCell is not working properly
     }
 }

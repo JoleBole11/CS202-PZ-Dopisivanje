@@ -1,5 +1,8 @@
 package com.example.cs202pzdopisivanje.Requests;
 
+/**
+ * Represents the communication request for joining a group.
+ */
 public class JoinGroupRequest extends Request{
     private int userId;
     private String groupName;

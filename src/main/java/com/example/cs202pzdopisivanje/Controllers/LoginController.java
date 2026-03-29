@@ -1,13 +1,10 @@
 package com.example.cs202pzdopisivanje.Controllers;
 
 import Enums.SceneEnum;
-import com.example.cs202pzdopisivanje.Database.DbManager;
 import com.example.cs202pzdopisivanje.HomeApplication;
 import com.example.cs202pzdopisivanje.Network.Client;
-import com.example.cs202pzdopisivanje.Objects.User;
 import com.example.cs202pzdopisivanje.Requests.LoginRequest;
 import com.example.cs202pzdopisivanje.Requests.UsernameRequest;
-import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -15,6 +12,10 @@ import javafx.scene.control.TextField;
 
 import java.io.IOException;
 
+/**
+ * LoginController manages all the functions of the Login page in the application.
+ * Is used for logging into the application via username and password as well as changing to registering.
+ */
 public class LoginController {
 
     @FXML
@@ -26,6 +27,9 @@ public class LoginController {
     @FXML
     private Label errorLabel;
 
+    /**
+     * Attempts to log the user into the application.
+     */
     @FXML
     protected void OnLoginButtonClick() throws IOException {
         String username = usernameField.getText();
@@ -67,6 +71,9 @@ public class LoginController {
         }
     }
 
+    /**
+     * Changes to the registration page.
+     */
     @FXML
     public void OnRegisterButtonClick(ActionEvent actionEvent) {
         HomeApplication.switchScene(SceneEnum.REGISTER);

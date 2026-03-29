@@ -27,7 +27,7 @@ public class GroupService {
      * The current user becomes the creator and is automatically added as a member.
      * 
      * @param groupName The name of the group to create
-     * @return "Success" if a group is created successfully, error message otherwise
+     * @return "Success" if a group is created successfully, "Error" otherwise
      */
     public String createGroup(String groupName, int isGroup) {
 
@@ -36,34 +36,32 @@ public class GroupService {
         }
 
         try {
-            connection.setAutoCommit(false); // Start transaction
-            
-            // Create the group
+            connection.setAutoCommit(false);
+
             int groupId = insertGroup(groupName, isGroup);
             if (groupId == -1) {
                 connection.rollback();
-                return "Failed to create group";
+                return "Error";
             }
-            
-            // Add the creator as a member of the group
+
             if (Objects.equals(addUserToGroup(groupName, DbManager.getAccountID(),"creator"), "Error")) {
                 connection.rollback();
-                return "Failed to add creator to group";
+                return "Error";
             }
             
-            connection.commit(); // Commit transaction
+            connection.commit();
             return "Success";
             
         } catch (SQLException e) {
             e.printStackTrace();
-            return "Database error occurred";
+            return "Error";
         } finally {
             try {
                 if (connection != null) {
-                    connection.setAutoCommit(true); // Reset auto-commit
+                    connection.setAutoCommit(true);
                 }
             } catch (SQLException e) {
-                System.err.println("Error resetting auto-commit: " + e.getMessage());
+                e.printStackTrace();
             }
         }
     }
@@ -87,7 +85,7 @@ public class GroupService {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error checking if group exists: " + e.getMessage());
+            e.printStackTrace();
         }
         
         return false;
@@ -97,6 +95,7 @@ public class GroupService {
      * Inserts a new group into the database.
      *
      * @param groupName The name of the group
+     * @param isGroup If it should be a group or not
      * @return The ID of the created group, or -1 if failed
      */
     public int insertGroup(String groupName, int isGroup) {
@@ -116,7 +115,7 @@ public class GroupService {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error inserting group: " + e.getMessage());
+            e.printStackTrace();
         }
         
         return -1;
@@ -126,7 +125,9 @@ public class GroupService {
      * Adds a user to a group.
      *
      * @param groupName The Name of the group
-     * @return true if successful, false otherwise
+     * @param userId The ID of the user
+     * @param role The role the user will be when added
+     * @return "Success" if successful, "Error" otherwise
      */
     public String addUserToGroup(String groupName, int userId, String role) {
         final String query = GroupQuery.addUserToGroup();
@@ -143,7 +144,7 @@ public class GroupService {
             }
             return "Error";
         } catch (SQLException e) {
-            System.err.println("Error adding user to group: " + e.getMessage());
+            e.printStackTrace();
             return "Error";
         }
     }

@@ -12,6 +12,10 @@ import javafx.scene.control.TextField;
 
 import java.io.IOException;
 
+/**
+ * ProfileController manages all the functions of the Profile page in the application.
+ * Supports editing a user's profile (username and password).
+ */
 public class ProfileController {
 
     @FXML
@@ -28,11 +32,17 @@ public class ProfileController {
         HomeApplication.switchScene(SceneEnum.HOME);
     }
 
+    /**
+     * Is run on opening the friend's page.
+     */
     public void initialize() {
         usernameField.setText(HomeApplication.currentUser.getUsername());
         passwordField.setText(HomeApplication.currentUser.getPassword());
     }
 
+    /**
+     * Tries to save the users updated information.
+     */
     @FXML
     public void OnSaveButtonClick(ActionEvent actionEvent) throws IOException {
 
@@ -65,7 +75,10 @@ public class ProfileController {
         }
     }
 
-    /** Sets the text to display the error when logging in. */
+    /**
+     * showError displays an error.
+     * @param s Text that will be displayed.
+     */
     private void showError(String s) {
         if (errorLabel != null) {
             errorLabel.setText(s);
@@ -74,6 +87,10 @@ public class ProfileController {
         }
     }
 
+    /**
+     * showError displays a success.
+     * @param s Text that will be displayed.
+     */
     private void showSuccess(String s) {
         if (errorLabel != null) {
             errorLabel.setText(s);

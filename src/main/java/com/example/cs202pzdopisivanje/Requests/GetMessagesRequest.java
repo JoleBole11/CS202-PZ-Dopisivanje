@@ -4,6 +4,9 @@ import com.example.cs202pzdopisivanje.Objects.Message;
 
 import java.util.List;
 
+/**
+ * Represents the communication request for getting messages.
+ */
 public class GetMessagesRequest extends Request {
     private int chatId;
     private List<Message> messages;

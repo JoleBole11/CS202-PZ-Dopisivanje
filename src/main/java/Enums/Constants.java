@@ -1,7 +1,7 @@
 package Enums;
 
 /**
- * Constants class containing string constants used in the ATM application.
+ * Constants class containing string constants used in the Messaging application.
  */
 public class Constants {
     public static String notConnected = "Not connected!";

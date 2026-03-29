@@ -66,20 +66,17 @@ public class Server {
         System.out.println(Constants.serverStarted);
         up = true;
 
-        // Initialize thread pool for client connections
         clientThreadPool = Executors.newCachedThreadPool();
 
         DbManager.connect();
 
         System.out.println(Constants.serverIsWaitingForConnection);
-        
-        // Accept multiple client connections
+
         while (isUp()) {
             try {
                 final Socket clientSocket = serverSocket.accept();
                 System.out.println(Constants.clientConnected);
-                
-                // Create a new client handler and submit it to the thread pool
+
                 ClientHandler clientHandler = new ClientHandler(clientSocket);
                 clientThreadPool.submit(clientHandler);
                 
@@ -108,42 +105,13 @@ public class Server {
     }
 
     /**
-     * Stops the server, closes the server socket, and disconnects from the database.
-     *
-     * @throws IOException If an I/O error occurs while stopping the server.
-     */
-    public static void stop() throws IOException {
-        if (!isUp()) return;
-        
-        up = false;
-        
-        // Close all client connections
-        for (ClientHandler client : connectedClients.values()) {
-            client.disconnect();
-        }
-        connectedClients.clear();
-        
-        // Shutdown thread pool
-        if (clientThreadPool != null) {
-            clientThreadPool.shutdown();
-        }
-        
-        if (serverSocket != null) {
-            serverSocket.close();
-        }
-        
-        DbManager.disconnect();
-        System.out.println("Server stopped and database disconnected");
-    }
-
-    /**
      * Inner class to handle individual client connections
      */
     private static class ClientHandler implements Runnable {
         private final Socket socket;
         private Handler handler;
         private String clientId;
-        private Integer currentUserId = null; // Track the logged-in user for this client
+        private Integer currentUserId = null;
 
         public ClientHandler(Socket socket) {
             this.socket = socket;
@@ -166,7 +134,7 @@ public class Server {
                     handleRequest(received);
                 }
             } catch (Exception e) {
-                System.err.println("Error handling client " + clientId + ": " + e.getMessage());
+                e.printStackTrace();
             } finally {
                 disconnect();
             }
@@ -183,7 +151,7 @@ public class Server {
                 int loginResult = DbManager.userService().login(request.getUsername(), request.getPassword());
                 request.setId(loginResult);
                 if (loginResult > 0) {
-                    currentUserId = loginResult; // Store the logged-in user ID for this client
+                    currentUserId = loginResult;
                     System.out.println("Client " + clientId + " logged in as user ID: " + currentUserId);
                 }
                 handler.send(request);
@@ -192,7 +160,7 @@ public class Server {
                 int registerResult = DbManager.userService().register(request.getUsername(), request.getPassword());
                 request.setId(registerResult);
                 if (registerResult > 0) {
-                    currentUserId = registerResult; // Store the registered user ID for this client
+                    currentUserId = registerResult;
                     System.out.println("Client " + clientId + " registered as user ID: " + currentUserId);
                 }
                 handler.send(request);
@@ -205,7 +173,6 @@ public class Server {
             }
             else if (received instanceof GroupRequest request) {
                 if (currentUserId != null) {
-                    // Temporarily set the account ID for this operation
                     int originalAccountId = DbManager.getAccountID();
                     DbManager.setAccountID(currentUserId);
                     try {
@@ -218,7 +185,6 @@ public class Server {
             }
             else if (received instanceof FriendRequest request) {
                 if (currentUserId != null) {
-                    // Temporarily set the account ID for this operation
                     int originalAccountId = DbManager.getAccountID();
                     DbManager.setAccountID(currentUserId);
                     try {
@@ -315,10 +281,8 @@ public class Server {
             }
             else if (received instanceof SendMessageRequest request) {
                 if (currentUserId != null) {
-                    // Use the current client's user ID instead of DbManager.getAccountID()
                     int result = DbManager.MessageService().sendMessage(currentUserId, request.getChatId(), request.getMessageText());
                     request.setChatId(result);
-                    System.out.println("Message sent by user ID: " + currentUserId + " to chat: " + request.getChatId());
                 }
                 handler.send(request);
             }

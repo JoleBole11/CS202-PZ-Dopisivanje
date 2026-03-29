@@ -18,6 +18,9 @@ import javafx.scene.layout.Region;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * Custom cell factory for displaying Friend requests in ListView.
+ */
 public class FriendRequestCell extends ListCell<FriendRequestObject> {
 
     private final HBox hBox = new HBox(10);
@@ -56,26 +59,29 @@ public class FriendRequestCell extends ListCell<FriendRequestObject> {
 
         setGraphic(hBox);
     }
-    
+
+    /**
+     * Accepts the pending Friend Request.
+     */
     private void acceptFriendRequest(FriendRequestObject item) {
         try {
             Client.getHandler().send(new AcceptFriendRequest(item.getName()));
             AcceptFriendRequest response = (AcceptFriendRequest) Client.getHandler().tryReceive();
-
-            //Client.getHandler().send(new JoinGroupRequest(DbManager.getAccountID(), ))
             
             if (Objects.equals(response.getUsername(), "Success")) {
                 Platform.runLater(() -> getListView().getItems().remove(item));
                 System.out.println("Friend request accepted successfully");
             } else {
-                System.err.println("Failed to accept friend request: " + response.getUsername());
+                System.out.println("Failed to accept friend request: " + response.getUsername());
             }
         } catch (IOException e) {
-            System.err.println("Error accepting friend request: " + e.getMessage());
             e.printStackTrace();
         }
     }
-    
+
+    /**
+     * Denies the pending Friend Request.
+     */
     private void denyFriendRequest(FriendRequestObject item) {
         try {
             Client.getHandler().send(new DenyFriendRequest(item.getName()));
@@ -85,10 +91,9 @@ public class FriendRequestCell extends ListCell<FriendRequestObject> {
                 Platform.runLater(() -> getListView().getItems().remove(item));
                 System.out.println("Friend request denied successfully");
             } else {
-                System.err.println("Failed to deny friend request: " + response.getUsername());
+                System.out.println("Failed to deny friend request: " + response.getUsername());
             }
         } catch (IOException e) {
-            System.err.println("Error denying friend request: " + e.getMessage());
             e.printStackTrace();
         }
     }

@@ -1,5 +1,8 @@
 package com.example.cs202pzdopisivanje.Requests;
 
+/**
+ * Represents the communication request for creating groups.
+ */
 public class CreateGroupRequest extends Request {
     private String groupName;
     private int isGroup;

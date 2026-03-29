@@ -1,12 +1,9 @@
 package com.example.cs202pzdopisivanje.Services;
 
-import com.example.cs202pzdopisivanje.Database.DbManager;
 import com.example.cs202pzdopisivanje.Database.Queries.MessageQuery;
 import com.example.cs202pzdopisivanje.Objects.Message;
 
 import java.sql.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,12 +26,12 @@ public class MessageService {
      * @param senderId The ID of the user sending the message
      * @param chatId The ID of the chat where the message is being sent
      * @param messageText The content of the message
-     * @return The Message object with the generated ID, or null if failed
+     * @return The ID of the Message object, or -1 if failed
      */
     public int sendMessage(int senderId, int chatId, String messageText) {
         try {
             PreparedStatement statement = connection.prepareStatement(
-                MessageQuery.INSERT_MESSAGE, 
+                MessageQuery.insertMessage(),
                 Statement.RETURN_GENERATED_KEYS
             );
             
@@ -52,7 +49,6 @@ public class MessageService {
             }
             
         } catch (SQLException e) {
-            System.err.println("Error sending message: " + e.getMessage());
             e.printStackTrace();
         }
         
@@ -86,7 +82,6 @@ public class MessageService {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error retrieving latest messages: " + e.getMessage());
             e.printStackTrace();
         }
 

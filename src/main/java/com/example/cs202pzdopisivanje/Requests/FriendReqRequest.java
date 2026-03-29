@@ -4,6 +4,9 @@ import com.example.cs202pzdopisivanje.Objects.FriendRequestObject;
 
 import java.util.List;
 
+/**
+ * Represents the communication request for getting friend requests.
+ */
 public class FriendReqRequest extends Request{
     int username;
     String type;

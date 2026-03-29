@@ -1,5 +1,8 @@
 package com.example.cs202pzdopisivanje.Requests;
 
+/**
+ * Represents the communication request to log in.
+ */
 public class LoginRequest extends Request {
     private final String username;
     private final String password;

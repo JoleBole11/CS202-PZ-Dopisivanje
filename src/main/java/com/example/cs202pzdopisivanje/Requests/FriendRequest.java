@@ -4,6 +4,9 @@ import com.example.cs202pzdopisivanje.Objects.Chat;
 
 import java.util.List;
 
+/**
+ * Represents the communication request for getting a user's friends.
+ */
 public class FriendRequest extends Request{
     int username;
     private List<Chat> friends;
