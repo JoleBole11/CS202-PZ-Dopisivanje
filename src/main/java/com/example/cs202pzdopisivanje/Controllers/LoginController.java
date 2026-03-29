@@ -18,12 +18,21 @@ import java.io.IOException;
  */
 public class LoginController {
 
+    /**
+     * The TextField input for the username.
+     */
     @FXML
     private TextField usernameField;
 
+    /**
+     * The TextField input for the password.
+     */
     @FXML
     private TextField passwordField;
 
+    /**
+     * The error label to display success or error.
+     */
     @FXML
     private Label errorLabel;
 

@@ -8,8 +8,13 @@ import java.util.List;
  * Represents the communication request for getting friend requests.
  */
 public class FriendReqRequest extends Request{
+    /**
+     * The username of the friend.
+     */
     int username;
-    String type;
+    /**
+     * The List containing friend requests.
+     */
     private List<FriendRequestObject> friendRequests;
 
     public FriendReqRequest(int userId) {

@@ -32,42 +32,99 @@ import java.util.concurrent.TimeUnit;
  */
 public class HomeController {
 
+    /**
+     * The ListView of friends in the Home page.
+     */
     @FXML
     private ListView<Chat> friendsList;
+    /**
+     * The ListView of groups in the Home page.
+     */
     @FXML
     private ListView<Chat> groupsList;
+    /**
+     * The Button used for creating a group.
+     */
     @FXML
     private Button createGroupButton;
+    /**
+     * The VBox displaying the join group menu.
+     */
     @FXML
     private VBox joinGroupVBox;
+    /**
+     * The VBox displaying the group creation menu.
+     */
     @FXML
     private VBox createGroupVBox;
+    /**
+     * The chatBox area of the screen.
+     */
     @FXML
     private BorderPane chatBox;
+    /**
+     * The error label for the group creation page.
+     */
     @FXML
     private Label errorLabelCreate;
+    /**
+     * The error label for the join group page.
+     */
     @FXML
     private Label errorLabelJoin;
+    /**
+     * The textField for the group creation menu group name.
+     */
     @FXML
     private TextField createGroupText;
+    /**
+     * The textField for the group join menu group name.
+     */
     @FXML
     private TextField joinGroupText;
+    /**
+     * The TextArea for sending a message.
+     */
     @FXML
     private TextArea messageTextArea;
+    /**
+     * The Scrollpane for the chat box.
+     */
     @FXML
     private ScrollPane chatScrollPane;
+    /**
+     * The TextFlow containing text nessages.
+     */
     @FXML
     private TextFlow chatTextFlow;
 
+    /**
+     * The List containing friends.
+     */
     private final ObservableList<Chat> friends = FXCollections.observableArrayList();
+    /**
+     * The List containing groups.
+     */
     private final ObservableList<Chat> groups = FXCollections.observableArrayList();
 
+    /**
+     * The Object of the currently selected Chat.
+     */
     private Chat selectedChat = null;
 
+    /**
+     * The message update scheduler.
+     */
     private ScheduledExecutorService messagePollingService;
+    /**
+     * The task to schedule.
+     */
     private ScheduledFuture<?> pollingTask;
+    /**
+     * The bool to track if message updating is active.
+     */
     private volatile boolean isPollingActive = false;
-    private int lastMessageCount = 0;
+
 
     /**
      * Is run on opening the friend's page.
@@ -158,7 +215,6 @@ public class HomeController {
         if (newValue != null) {
             selectedChat = newValue;
             Platform.runLater(() -> chatTextFlow.getChildren().clear());
-            lastMessageCount = 0;
             fetchAndDisplayMessages(selectedChat.getChatId());
 
             startMessagePolling();
@@ -190,8 +246,7 @@ public class HomeController {
                             if (messageResponse.getMessages() != null) {
                                 List<Message> messages = messageResponse.getMessages();
 
-                                if (messages.size() > lastMessageCount && selectedChat != null && selectedChat.getChatId() == currentChatId) {
-                                    lastMessageCount = messages.size();
+                                if (selectedChat != null && selectedChat.getChatId() == currentChatId) {
                                     Platform.runLater(() -> {
                                         if (selectedChat != null && selectedChat.getChatId() == currentChatId) {
                                             updateChatView(messages);
@@ -233,7 +288,6 @@ public class HomeController {
                     if (response instanceof GetMessagesRequest) {
                         GetMessagesRequest messageResponse = (GetMessagesRequest) response;
                         List<Message> messages = messageResponse.getMessages();
-                        lastMessageCount = messages != null ? messages.size() : 0;
 
                         Platform.runLater(() -> {
                             if (selectedChat != null && selectedChat.getChatId() == chatId) {

@@ -4,7 +4,13 @@ package com.example.cs202pzdopisivanje.Requests;
  * Represents the communication request for editing the user's profile.
  */
 public class EditRequest extends Request{
+    /**
+     * The username of the user.
+     */
     private String username;
+    /**
+     * The password of the user.
+     */
     private String password;
 
 

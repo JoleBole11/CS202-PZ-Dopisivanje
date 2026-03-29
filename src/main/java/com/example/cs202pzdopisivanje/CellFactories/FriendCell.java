@@ -21,9 +21,21 @@ import java.util.Objects;
  */
 public class FriendCell extends ListCell<Chat> {
 
+    /**
+     * The HBox representing the layout of the cell.
+     */
     private final HBox hBox = new HBox(10);
+    /**
+     * The name that will be displayed in the cell.
+     */
     private final Label nameLabel = new Label();
+    /**
+     * An aesthetic spacer.
+     */
     private final Region spacer = new Region();
+    /**
+     * The button to remove a friend.
+     */
     private final Button removeButton = new Button("Remove");
 
     public FriendCell() {
@@ -50,7 +62,7 @@ public class FriendCell extends ListCell<Chat> {
     }
 
     /**
-     * Removes Friend when button is clicked.
+     * Removes Friend when the button is clicked.
      */
     private void removeFriend(Chat friendChat) {
         try {

@@ -4,8 +4,17 @@ package com.example.cs202pzdopisivanje.Requests;
  * Represents the communication request for joining a group.
  */
 public class JoinGroupRequest extends Request{
+    /**
+     * The ID of the user.
+     */
     private int userId;
+    /**
+     * The name of the group.
+     */
     private String groupName;
+    /**
+     * The role the user will join as.
+     */
     private String role;
 
     public JoinGroupRequest(int userId, String groupName, String role) {

@@ -75,8 +75,7 @@ public class MessageService {
                         resultSet.getInt("message_id"),
                         resultSet.getString("username"),
                         resultSet.getInt("chat_id"),
-                        resultSet.getString("message_string"),
-                        resultSet.getString("time_sent")
+                        resultSet.getString("message_string")
                 );
                 messages.add(message);
             }

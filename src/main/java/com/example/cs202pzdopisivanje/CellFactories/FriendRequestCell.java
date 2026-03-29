@@ -23,11 +23,29 @@ import java.util.Objects;
  */
 public class FriendRequestCell extends ListCell<FriendRequestObject> {
 
+    /**
+     * The HBox representing the layout of the cell.
+     */
     private final HBox hBox = new HBox(10);
+    /**
+     * The name that will be displayed in the cell.
+     */
     private final Label nameLabel = new Label();
+    /**
+     * An aesthetic spacer.
+     */
     private final Region spacer = new Region();
+    /**
+     * The button to accept a friend request.
+     */
     private final Button acceptButton = new Button("Accept");
+    /**
+     * The button to deny a friend request.
+     */
     private final Button denyButton = new Button("Deny");
+    /**
+     * A label that displays if a request is pending.
+     */
     private final Label pendingLabel = new Label("Pending");
 
     public FriendRequestCell() {

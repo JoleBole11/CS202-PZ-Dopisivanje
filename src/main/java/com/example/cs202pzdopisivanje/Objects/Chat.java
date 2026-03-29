@@ -7,7 +7,13 @@ import java.util.Objects;
  * Represents the Chat object.
  */
 public class Chat implements Serializable {
+    /**
+     * The ID of the chat.
+     */
     private int chatId;
+    /**
+     * The name of the chat.
+     */
     private String chatName;
 
     public Chat(int chatId, String chatName) {

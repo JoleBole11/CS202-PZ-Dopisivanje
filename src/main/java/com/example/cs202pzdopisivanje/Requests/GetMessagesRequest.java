@@ -8,7 +8,13 @@ import java.util.List;
  * Represents the communication request for getting messages.
  */
 public class GetMessagesRequest extends Request {
+    /**
+     * The ID of the chat.
+     */
     private int chatId;
+    /**
+     * The List containing messages.
+     */
     private List<Message> messages;
 
     public GetMessagesRequest(int chatId) {

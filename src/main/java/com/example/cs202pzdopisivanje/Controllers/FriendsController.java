@@ -30,19 +30,49 @@ import java.util.Objects;
  */
 public class FriendsController {
 
+    /**
+     * The ListView of friends.
+     */
     public ListView<Chat> friendsList;
+    /**
+     * The ListView of pending friend requests.
+     */
     public ListView<FriendRequestObject> requestsList;
+    /**
+     * The ListView of sent friend requests.
+     */
     public ListView<FriendRequestObject> sentList;
+    /**
+     * The VBox of the add friend page.
+     */
     public VBox addFriendPage;
 
+    /**
+     * The TextField input of a friend to send a request to.
+     */
     @FXML
     private TextField friendUsernameField;
+    /**
+     * The error label to display error or success.
+     */
     @FXML
     private Label errorLabel;
 
+    /**
+     * The List of a user's friends.
+     */
     private final ObservableList<Chat> friends = FXCollections.observableArrayList();
+    /**
+     * The List of a user's friend requests.
+     */
     private final ObservableList<FriendRequestObject> friendRequests = FXCollections.observableArrayList();
+    /**
+     * The List of a user's pending friend requests.
+     */
     private final ObservableList<FriendRequestObject> requests = FXCollections.observableArrayList();
+    /**
+     * The List of a user's sent friend requests.
+     */
     private final ObservableList<FriendRequestObject> sent = FXCollections.observableArrayList();
 
     /**

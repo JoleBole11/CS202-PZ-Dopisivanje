@@ -4,8 +4,17 @@ package com.example.cs202pzdopisivanje.Requests;
  * Represents the communication request for sending a message.
  */
 public class SendMessageRequest extends Request {
+    /**
+     * The ID of the message sender.
+     */
     private int senderId;
+    /**
+     * The ID of the chat.
+     */
     private int chatId;
+    /**
+     * The text of the message.
+     */
     private String messageText;
     
     public SendMessageRequest(int senderId, int chatId, String messageText) {

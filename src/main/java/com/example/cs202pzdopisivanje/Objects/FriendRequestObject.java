@@ -6,7 +6,14 @@ import java.io.Serializable;
  * Represents the Friend Request Object.
  */
 public class FriendRequestObject implements Serializable {
+    /**
+     * The name of the friend.
+     */
     private String name;
+
+    /**
+     * The type of request.
+     */
     private String type;
 
     public FriendRequestObject(String name, String type) {

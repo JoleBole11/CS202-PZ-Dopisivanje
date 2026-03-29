@@ -4,8 +4,17 @@ package com.example.cs202pzdopisivanje.Objects;
  * Represents the User object.
  */
 public class User {
+    /**
+     * The ID of the user.
+     */
     private int userId;
+    /**
+     * The username of the user.
+     */
     private String username;
+    /**
+     * The password of the user.
+     */
     private String password;
 
     public User(String username, String password, int userId) {

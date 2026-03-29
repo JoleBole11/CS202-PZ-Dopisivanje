@@ -8,7 +8,13 @@ import java.util.List;
  * Represents the communication request for getting a user's friends.
  */
 public class FriendRequest extends Request{
+    /**
+     * The name of the friend.
+     */
     int username;
+    /**
+     * The List of friends.
+     */
     private List<Chat> friends;
 
     public FriendRequest(int userId) {

@@ -8,7 +8,13 @@ import java.util.List;
  * Represents the communication request for getting groups.
  */
 public class GroupRequest extends Request{
+    /**
+     * The ID of the user.
+     */
     int userId;
+    /**
+     * The List containing groups.
+     */
     private List<Chat> groups;
 
     public GroupRequest(int userId) {

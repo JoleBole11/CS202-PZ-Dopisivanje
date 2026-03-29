@@ -1,25 +1,36 @@
 package com.example.cs202pzdopisivanje.Objects;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 /**
  * Represents the Message object.
  */
 public class Message implements Serializable {
+    /**
+     * The ID of the message.
+     */
     private int id;
-    private String username;
-    private int chatId;
-    private String message;
-    private String timeSent;
 
-    public Message(int id, String username, int chatId, String message, String timeSent) {
+    /**
+     * The username of the sender.
+     */
+    private String username;
+
+    /**
+     * The ID of the chat the message belongs to.
+     */
+    private int chatId;
+
+    /**
+     * The text of the message.
+     */
+    private String message;
+
+    public Message(int id, String username, int chatId, String message) {
         this.id = id;
         this.username = username;
         this.chatId = chatId;
         this.message = message;
-        this.timeSent = timeSent;
     }
 
     public int getId() {
@@ -52,13 +63,5 @@ public class Message implements Serializable {
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    public String getTimeSent() {
-        return timeSent;
-    }
-
-    public void setTimeSent(String timeSent) {
-        this.timeSent = timeSent;
     }
 }

@@ -4,8 +4,17 @@ package com.example.cs202pzdopisivanje.Requests;
  * Represents the communication request to log in.
  */
 public class LoginRequest extends Request {
+    /**
+     * The username of the user.
+     */
     private final String username;
+    /**
+     * The password of the user.
+     */
     private final String password;
+    /**
+     * The ID of the user.
+     */
     private int id;
 
     public LoginRequest(String username, String password) {

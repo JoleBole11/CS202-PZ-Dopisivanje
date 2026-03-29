@@ -4,7 +4,13 @@ package com.example.cs202pzdopisivanje.Requests;
  * Represents the communication request for getting a user.
  */
 public class UsernameRequest extends Request{
+    /**
+     * The username of the user.
+     */
     private String username;
+    /**
+     * The ID of the user.
+     */
     private int id;
 
     public UsernameRequest(String username) {
