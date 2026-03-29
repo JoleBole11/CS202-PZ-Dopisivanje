@@ -12,7 +12,7 @@ import java.net.Socket;
  * Handler class facilitates communication between a client and server in the ATM application.
  * Manages object input and output streams for sending and receiving requests.
  */
-public class Handler implements AutoCloseable {
+public class Handler extends Thread implements AutoCloseable {
     /**
      * The output stream for sending objects to the connected entity.
      */

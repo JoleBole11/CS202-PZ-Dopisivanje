@@ -1,6 +1,7 @@
 package com.example.cs202pzdopisivanje.Controllers;
 
 import Enums.SceneEnum;
+import com.example.cs202pzdopisivanje.CellFactories.FriendCell;
 import com.example.cs202pzdopisivanje.CellFactories.FriendRequestCell;
 import com.example.cs202pzdopisivanje.Database.DbManager;
 import com.example.cs202pzdopisivanje.HomeApplication;
@@ -19,15 +20,16 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 // Add these imports at the top
-import com.example.cs202pzdopisivanje.CellFactories.FriendCell;
 import com.example.cs202pzdopisivanje.Requests.RemoveFriendRequest;
+import com.example.cs202pzdopisivanje.Objects.Chat;
+import com.example.cs202pzdopisivanje.CellFactories.ChatCell;
 
 import java.io.IOException;
 import java.util.Objects;
 
 public class FriendsController {
 
-    public ListView<String> friendsList;
+    public ListView<Chat> friendsList;
     public ListView<FriendRequestObject> requestsList;
     public ListView<FriendRequestObject> sentList;
     public VBox addFriendPage;
@@ -37,7 +39,7 @@ public class FriendsController {
     @FXML
     private Label errorLabel;
 
-    private final ObservableList<String> friends = FXCollections.observableArrayList();
+    private final ObservableList<Chat> friends = FXCollections.observableArrayList();
     private final ObservableList<FriendRequestObject> friendRequests = FXCollections.observableArrayList();
     private final ObservableList<FriendRequestObject> requests = FXCollections.observableArrayList();
     private final ObservableList<FriendRequestObject> sent = FXCollections.observableArrayList();
@@ -47,10 +49,11 @@ public class FriendsController {
         HomeApplication.switchScene(SceneEnum.HOME);
     }
     
+    @FXML
     public void initialize() {
         if (friendsList != null) {
             friendsList.setItems(friends);
-            friendsList.setCellFactory(lv -> new FriendCell()); // Add this line
+            friendsList.setCellFactory(lv -> new FriendCell()); // Use ChatCell instead of FriendCell
             friendsList.toFront();
         }
 
@@ -71,7 +74,7 @@ public class FriendsController {
 
             if (response != null && response.getFriends() != null) {
                 friends.clear();
-                friends.addAll(response.getFriends());
+                friends.addAll(response.getFriends()); // Now List<Chat>
                 System.out.println("Loaded " + friends.size() + " friends");
             } else {
                 System.out.println("No friends received or response was null");
@@ -105,7 +108,7 @@ public class FriendsController {
 
             if (response != null && response.getFriends() != null) {
                 friends.clear();
-                friends.addAll(response.getFriends());
+                friends.addAll(response.getFriends()); // Now List<Chat>
                 System.out.println("Loaded " + friends.size() + " friends");
             } else {
                 System.out.println("No friends received or response was null");
@@ -115,7 +118,7 @@ public class FriendsController {
         }
 
         if (friendsList != null) {
-            friendsList.setCellFactory(lv -> new FriendCell()); // Add this line
+            friendsList.setCellFactory(lv -> new FriendCell()); // Use ChatCell
             friendsList.toFront();
             addFriendPage.toBack();
             sentList.toBack();

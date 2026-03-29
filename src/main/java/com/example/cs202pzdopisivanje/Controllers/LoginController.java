@@ -55,6 +55,7 @@ public class LoginController {
 
         HomeApplication.currentUser.setPassword(password);
         HomeApplication.currentUser.setUsername(username);
+        HomeApplication.currentUser.setUserId(response2.getId());
         HomeApplication.switchScene(SceneEnum.HOME);
     }
 

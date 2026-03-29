@@ -5,10 +5,9 @@ import javafx.scene.control.ListCell;
 
 /**
  * Custom cell factory for displaying Chat objects in ListView.
- * Shows the chat name but keeps the Chat object with its ID intact.
  */
 public class ChatCell extends ListCell<Chat> {
-    
+
     @Override
     protected void updateItem(Chat chat, boolean empty) {
         super.updateItem(chat, empty);

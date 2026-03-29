@@ -1,6 +1,8 @@
 package com.example.cs202pzdopisivanje.CellFactories;
 
+import com.example.cs202pzdopisivanje.Database.DbManager;
 import com.example.cs202pzdopisivanje.Network.Client;
+import com.example.cs202pzdopisivanje.Objects.Chat;
 import com.example.cs202pzdopisivanje.Requests.RemoveFriendRequest;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
@@ -14,7 +16,7 @@ import javafx.scene.layout.Region;
 import java.io.IOException;
 import java.util.Objects;
 
-public class FriendCell extends ListCell<String> {
+public class FriendCell extends ListCell<Chat> {
 
     private final HBox hBox = new HBox(10);
     private final Label nameLabel = new Label();
@@ -28,29 +30,29 @@ public class FriendCell extends ListCell<String> {
     }
 
     @Override
-    protected void updateItem(String item, boolean empty) {
-        super.updateItem(item, empty);
-        if (empty || item == null) {
+    protected void updateItem(Chat chat, boolean empty) {
+        super.updateItem(chat, empty);
+        if (empty || chat == null) {
             setGraphic(null);
             return;
         }
 
-        nameLabel.setText(item);
+        nameLabel.setText(chat.getChatName());
         hBox.getChildren().clear();
         
-        removeButton.setOnAction(e -> removeFriend(item));
+        removeButton.setOnAction(e -> removeFriend(chat));
         hBox.getChildren().addAll(nameLabel, spacer, removeButton);
 
         setGraphic(hBox);
     }
     
-    private void removeFriend(String friendName) {
+    private void removeFriend(Chat friendChat) {
         try {
-            Client.getHandler().send(new RemoveFriendRequest(friendName));
+            Client.getHandler().send(new RemoveFriendRequest(friendChat.getChatName()));
             RemoveFriendRequest response = (RemoveFriendRequest) Client.getHandler().tryReceive();
             
             if (Objects.equals(response.getUsername(), "Success")) {
-                Platform.runLater(() -> getListView().getItems().remove(friendName));
+                Platform.runLater(() -> getListView().getItems().remove(friendChat));
                 System.out.println("Friend removed successfully");
             } else {
                 System.err.println("Failed to remove friend: " + response.getUsername());

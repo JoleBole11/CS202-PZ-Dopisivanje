@@ -24,7 +24,7 @@ public class HomeApplication extends Application {
             primaryStage.setTitle("Dopisivanje");
             switchScene(SceneEnum.LOGIN);
             stage.show();
-            currentUser = new User("", "");
+            currentUser = new User("", "", 0);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -8,9 +8,7 @@ import com.example.cs202pzdopisivanje.Network.Client;
 import com.example.cs202pzdopisivanje.Objects.Chat;
 import com.example.cs202pzdopisivanje.Objects.Message;
 import com.example.cs202pzdopisivanje.Requests.*;
-import com.example.cs202pzdopisivanje.Services.MessageService;
 import javafx.application.Platform;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -23,11 +21,15 @@ import javafx.scene.text.TextFlow;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class HomeController {
 
     @FXML
-    private ListView<String> friendsList;
+    private ListView<Chat> friendsList;
     @FXML
     private ListView<Chat> groupsList;
     @FXML
@@ -53,17 +55,37 @@ public class HomeController {
     @FXML
     private TextFlow chatTextFlow;
 
-
-    private final ObservableList<String> friends = FXCollections.observableArrayList();
+    private final ObservableList<Chat> friends = FXCollections.observableArrayList();
     private final ObservableList<Chat> groups = FXCollections.observableArrayList();
     
     // Keep track of currently selected chat
     private Chat selectedChat = null;
+    
+    // Real-time message polling
+    private ScheduledExecutorService messagePollingService;
+    private ScheduledFuture<?> pollingTask;
+    private volatile boolean isPollingActive = false;
+    private int lastMessageCount = 0;
 
     @FXML
     public void initialize() throws IOException {
         if (friendsList != null) {
             friendsList.setItems(friends);
+            friendsList.setCellFactory(listView -> new ChatCell());
+            
+            // Add selection listener for friends list
+            friendsList.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    selectedChat = newValue;
+                    if (selectedChat != null) {
+                        // Clear groups selection when friends item is selected
+                        groupsList.getSelectionModel().clearSelection();
+                        System.out.println("Selected friend chat: " + selectedChat.getChatName() + 
+                                         " (ID: " + selectedChat.getChatId() + ")");
+                        onChatSelectionChanged(selectedChat);
+                    }
+                }
+            );
             friendsList.toFront();
         }
 
@@ -78,7 +100,9 @@ public class HomeController {
                 (observable, oldValue, newValue) -> {
                     selectedChat = newValue;
                     if (selectedChat != null) {
-                        System.out.println("Selected chat: " + selectedChat.getChatName() + 
+                        // Clear friends selection when groups item is selected
+                        friendsList.getSelectionModel().clearSelection();
+                        System.out.println("Selected group chat: " + selectedChat.getChatName() + 
                                          " (ID: " + selectedChat.getChatId() + ")");
                         onChatSelectionChanged(selectedChat);
                     }
@@ -92,6 +116,13 @@ public class HomeController {
         createGroupVBox.setDisable(true);
         chatBox.setVisible(true);
         chatBox.setDisable(false);
+
+        // Initialize message polling service
+        messagePollingService = Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread t = new Thread(r, "MessagePolling");
+            t.setDaemon(true);
+            return t;
+        });
 
         try {
             Client.getHandler().send(new GroupRequest(DbManager.getAccountID()));
@@ -125,34 +156,100 @@ public class HomeController {
         if (newValue != null) {
             selectedChat = newValue;
             // When a new chat is selected, clear the old messages and fetch the new ones.
-            chatTextFlow.getChildren().clear();
+            Platform.runLater(() -> chatTextFlow.getChildren().clear());
+            lastMessageCount = 0;
             fetchAndDisplayMessages(selectedChat.getChatId());
+            
+            // Start polling for new messages
+            startMessagePolling();
+        } else {
+            // Stop polling when no chat is selected
+            stopMessagePolling();
+        }
+    }
+
+    private synchronized void startMessagePolling() {
+        stopMessagePolling(); // Ensure any existing polling is stopped
+        
+        if (selectedChat == null) return;
+        
+        isPollingActive = true;
+        final int currentChatId = selectedChat.getChatId();
+        
+        pollingTask = messagePollingService.scheduleAtFixedRate(() -> {
+            if (isPollingActive && selectedChat != null && selectedChat.getChatId() == currentChatId) {
+                try {
+                    // Create a new handler connection for polling to avoid conflicts
+                    synchronized (Client.getHandler()) {
+                        Client.getHandler().send(new GetMessagesRequest(currentChatId));
+                        Object response = Client.getHandler().tryReceive();
+                        
+                        if (response instanceof GetMessagesRequest) {
+                            GetMessagesRequest messageResponse = (GetMessagesRequest) response;
+                            if (messageResponse.getMessages() != null) {
+                                List<Message> messages = messageResponse.getMessages();
+                                
+                                // Only update if there are new messages and we're still on the same chat
+                                if (messages.size() > lastMessageCount && selectedChat != null && selectedChat.getChatId() == currentChatId) {
+                                    lastMessageCount = messages.size();
+                                    Platform.runLater(() -> {
+                                        if (selectedChat != null && selectedChat.getChatId() == currentChatId) {
+                                            updateChatView(messages);
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error polling for messages: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        }, 2, 3, TimeUnit.SECONDS); // Poll every 3 seconds, start after 2 seconds
+    }
+
+    private synchronized void stopMessagePolling() {
+        isPollingActive = false;
+        if (pollingTask != null && !pollingTask.isCancelled()) {
+            pollingTask.cancel(true);
+            pollingTask = null;
         }
     }
 
     private void fetchAndDisplayMessages(int chatId) {
-        GetMessagesRequest request = new GetMessagesRequest(chatId);
-
         new Thread(() -> {
             try {
-                // This is an example of how you might send a request and get a response.
-                // You MUST replace this with your actual client-side networking implementation.
-                Client.getHandler().send(new GetMessagesRequest(chatId));
-                GetMessagesRequest response = (GetMessagesRequest) Client.getHandler().tryReceive();
+                synchronized (Client.getHandler()) {
+                    Client.getHandler().send(new GetMessagesRequest(chatId));
+                    Object response = Client.getHandler().tryReceive();
 
-                if (response != null) {
-                    List<Message> messages = ((GetMessagesRequest) response).getMessages();
-                    // UI updates must run on the JavaFX Application Thread.
-                    Platform.runLater(() -> updateChatView(messages));
+                    if (response instanceof GetMessagesRequest) {
+                        GetMessagesRequest messageResponse = (GetMessagesRequest) response;
+                        List<Message> messages = messageResponse.getMessages();
+                        lastMessageCount = messages != null ? messages.size() : 0;
+                        
+                        // UI updates must run on the JavaFX Application Thread.
+                        Platform.runLater(() -> {
+                            if (selectedChat != null && selectedChat.getChatId() == chatId) {
+                                updateChatView(messages);
+                            }
+                        });
+                    }
                 }
             } catch (Exception e) {
+                System.err.println("Error fetching messages: " + e.getMessage());
                 e.printStackTrace();
-                // Optionally, show an error message in the UI on the JavaFX thread.
             }
         }).start();
     }
 
     private void updateChatView(List<Message> messages) {
+        if (!Platform.isFxApplicationThread()) {
+            Platform.runLater(() -> updateChatView(messages));
+            return;
+        }
+        
         chatTextFlow.getChildren().clear();
         if (messages != null) {
             for (Message msg : messages) {
@@ -164,22 +261,30 @@ public class HomeController {
 
     @FXML
     public void OnEditMenuClick(ActionEvent actionEvent) {
+        cleanup();
         HomeApplication.switchScene(SceneEnum.PROFILE);
     }
 
     @FXML
     public void OnLogOutMenuClick(ActionEvent actionEvent) {
+        cleanup();
         HomeApplication.switchScene(SceneEnum.LOGIN);
     }
 
     @FXML
     public void OnFriendsButtonClick(ActionEvent actionEvent) {
+        cleanup();
         HomeApplication.switchScene(SceneEnum.FRIENDS);
     }
 
     @FXML
     public void OnFriendsMenuSelected(ActionEvent actionEvent) {
         if (friendsList != null) {
+            // Clear selections when switching to friends
+            groupsList.getSelectionModel().clearSelection();
+            selectedChat = null;
+            stopMessagePolling();
+            
             friendsList.toFront();
             groupsList.toBack();
             groupsList.setDisable(true);
@@ -187,13 +292,20 @@ public class HomeController {
             friendsList.setItems(friends);
             createGroupButton.setVisible(false);
             createGroupButton.setDisable(true);
-            selectedChat = null; // Clear chat selection when switching to friends
+            
+            // Clear chat view when switching
+            Platform.runLater(() -> chatTextFlow.getChildren().clear());
         }
     }
 
     @FXML
     public void OnGroupsMenuSelected(ActionEvent actionEvent) {
         if (groupsList != null) {
+            // Clear selections when switching to groups
+            friendsList.getSelectionModel().clearSelection();
+            selectedChat = null;
+            stopMessagePolling();
+            
             groupsList.toFront();
             friendsList.toBack();
             groupsList.setDisable(false);
@@ -201,6 +313,9 @@ public class HomeController {
             groupsList.setItems(groups);
             createGroupButton.setVisible(true);
             createGroupButton.setDisable(false);
+            
+            // Clear chat view when switching
+            Platform.runLater(() -> chatTextFlow.getChildren().clear());
         }
     }
 
@@ -235,8 +350,7 @@ public class HomeController {
                 showSuccess("Group '" + groupName + "' created successfully!", errorLabelCreate);
                 
                 // Add the new group to the local list as a Chat object
-                // You'll need to get the chat ID from the response or make another request
-                Chat newChat = new Chat(0, groupName); // Temporary ID, should be from response
+                Chat newChat = new Chat(0, groupName);
                 if (!groups.contains(newChat)) {
                     groups.add(newChat);
                 }
@@ -277,7 +391,7 @@ public class HomeController {
             }
 
             // Create request for group joining
-            JoinGroupRequest joinRequest = new JoinGroupRequest(DbManager.getAccountID(), groupName, "member");
+            JoinGroupRequest joinRequest = new JoinGroupRequest(HomeApplication.currentUser.getUserId(), groupName, "member");
 
             // Send the request
             Client.getHandler().send(joinRequest);
@@ -289,7 +403,7 @@ public class HomeController {
                 showSuccess("Group '" + groupName + "' joined successfully!", errorLabelJoin);
 
                 // Add the new group to the local list as a Chat object
-                Chat newChat = new Chat(0, groupName); // Temporary ID, should be from response
+                Chat newChat = new Chat(0, groupName);
                 if (!groups.contains(newChat)) {
                     groups.add(newChat);
                 }
@@ -312,6 +426,7 @@ public class HomeController {
     }
 
     public void OnCreateGroupMenuClick(ActionEvent actionEvent) {
+        stopMessagePolling();
         joinGroupVBox.setVisible(false);
         joinGroupVBox.setDisable(true);
         createGroupVBox.setVisible(true);
@@ -321,6 +436,7 @@ public class HomeController {
     }
 
     public void OnJoinGroupMenuClick(ActionEvent actionEvent) {
+        stopMessagePolling();
         joinGroupVBox.setVisible(true);
         joinGroupVBox.setDisable(false);
         createGroupVBox.setVisible(false);
@@ -353,21 +469,56 @@ public class HomeController {
             return;
         }
         
-        if (message == null || message.isEmpty()) {
+        if (message == null || message.trim().isEmpty()) {
             System.out.println("Message is empty!");
             return;
         }
 
-        // Now we can use the selectedChat.getChatId() for sending messages
-        SendMessageRequest sendMessageRequest = new SendMessageRequest(DbManager.getAccountID(), selectedChat.getChatId(), message);
-        
-        Client.getHandler().send(sendMessageRequest);
-        SendMessageRequest response = (SendMessageRequest) Client.getHandler().tryReceive();
+        // Send the message in a separate thread to avoid blocking UI
+        new Thread(() -> {
+            try {
+                synchronized (Client.getHandler()) {
+                    SendMessageRequest sendMessageRequest = new SendMessageRequest(DbManager.getAccountID(), selectedChat.getChatId(), message);
+                    
+                    Client.getHandler().send(sendMessageRequest);
+                    Object response = Client.getHandler().tryReceive();
 
-        if (response != null) {
-            System.out.println("Message sent to chat: " + selectedChat.getChatName());
-        }
+                    if (response instanceof SendMessageRequest) {
+                        System.out.println("Message sent to chat: " + selectedChat.getChatName());
+                        
+                        // Trigger an immediate refresh for better user experience
+                        Platform.runLater(() -> {
+                            if (selectedChat != null) {
+                                fetchAndDisplayMessages(selectedChat.getChatId());
+                            }
+                        });
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("Error sending message: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }).start();
 
+        // Clear the message field immediately for better UX
         messageTextArea.clear();
+    }
+
+    /**
+     * Clean up resources when the controller is destroyed or scene is changed
+     */
+    public void cleanup() {
+        stopMessagePolling();
+        if (messagePollingService != null && !messagePollingService.isShutdown()) {
+            messagePollingService.shutdown();
+            try {
+                if (!messagePollingService.awaitTermination(2, TimeUnit.SECONDS)) {
+                    messagePollingService.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                messagePollingService.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 }

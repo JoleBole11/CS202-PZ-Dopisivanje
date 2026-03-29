@@ -1,12 +1,22 @@
 package com.example.cs202pzdopisivanje.Objects;
 
 public class User {
+    private int userId;
     private String username;
     private String password;
 
-    public User(String username, String password) {
+    public User(String username, String password, int userId) {
         this.username = username;
         this.password = password;
+        this.userId = userId;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getUsername() {

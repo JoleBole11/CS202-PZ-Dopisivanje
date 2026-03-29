@@ -62,8 +62,6 @@ public class FriendRequestCell extends ListCell<FriendRequestObject> {
             Client.getHandler().send(new AcceptFriendRequest(item.getName()));
             AcceptFriendRequest response = (AcceptFriendRequest) Client.getHandler().tryReceive();
 
-
-
             //Client.getHandler().send(new JoinGroupRequest(DbManager.getAccountID(), ))
             
             if (Objects.equals(response.getUsername(), "Success")) {
